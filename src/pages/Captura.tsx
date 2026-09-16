@@ -12,6 +12,7 @@ import { ConceptoField } from '../features/captura/ConceptoField';
 import { CategoriaChips } from '../features/captura/CategoriaChips';
 import { FechaChip } from '../features/captura/FechaChip';
 import { UltimosMovimientos } from '../features/captura/UltimosMovimientos';
+import { validateMovimiento } from '../features/movimientos/EditarDialog';
 
 export default function Captura() {
   const monthKey = monthKeyOf(today());
@@ -68,6 +69,10 @@ export default function Captura() {
     return Object.keys(next).length === 0;
   };
 
+  // Solo para el aspecto del botón. Reutiliza las mismas reglas que aplica
+  // `validate()` al pulsarlo, sin fijar errores ni mover el foco.
+  const readyToSave = validateMovimiento({ amount, concept, categoryId, date }).values !== null;
+
   const handleSave = async () => {
     if (processing) return;
     if (!validate()) {
@@ -122,7 +127,22 @@ export default function Captura() {
             <FechaChip value={date} onChange={(d) => setDate(d)} error={errors.date} />
 
             <div className="row" style={{ justifyContent: 'flex-end' }}>
-              <Button onClick={handleSave} disabled={processing} aria-disabled={processing}>
+              <p
+                id="guardar-gasto-estado"
+                role="status"
+                className="muted"
+                style={{ margin: 0, fontSize: 'var(--font-size-14)' }}
+              >
+                {readyToSave ? 'Listo para guardar' : 'Completa los datos para guardar'}
+              </p>
+              <Button
+                variant="secondary"
+                className={`guardar-gasto${readyToSave ? ' guardar-gasto--listo' : ''}`}
+                aria-describedby="guardar-gasto-estado"
+                onClick={handleSave}
+                disabled={processing}
+                aria-disabled={processing}
+              >
                 Guardar
               </Button>
             </div>
