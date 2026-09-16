@@ -150,12 +150,20 @@ textarea,
   padding: var(--space-6) var(--space-5) var(--space-10);
 }
 
+/* Sin wrap, "Configuración" + selector de mes sumaban 555px y empujaban el
+   body a 587px en 320px (criterio 3 de SPEC-00). En escritorio hay sitio y no
+   se envuelve, así que el diseño no cambia. */
 .page-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
   margin-bottom: var(--space-6);
+}
+
+.page-header h1 {
+  min-width: 0;
 }
 
 .page-header h1 {
@@ -170,8 +178,13 @@ textarea,
   box-shadow: var(--shadow-soft);
 }
 
+/* `minmax(0, 1fr)` en lugar de la columna implícita `auto`: el mínimo de una
+   columna `auto` es el min-content del hijo más ancho, y una tabla o una fila
+   de categoría ensanchaban la pila entera. Con 0 de mínimo, el contenido ancho
+   cabe o hace scroll dentro de su tarjeta. */
 .stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
 }
 
@@ -384,8 +397,10 @@ textarea,
 }
 
 @media (max-width: 767px) {
+  /* `1fr` a secas es `minmax(auto, 1fr)`: el min-content de main empujaba la
+     columna (y el body) más allá del viewport. Escritorio ya usa minmax(0, 1fr). */
   .app-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding-bottom: 5rem;
   }
 
@@ -514,6 +529,7 @@ textarea,
 /* Categorías Lista */
 .categorias-lista {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
 }
 
@@ -524,13 +540,14 @@ textarea,
 
 .categorias-list-container {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 
 /* Categoría Row */
 .categoria-row {
   display: grid;
-  grid-template-columns: 20px 1fr auto;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-3) var(--space-4);
@@ -777,6 +794,10 @@ textarea,
 }
 
 /* Chart Data Table */
+.chart-data-table-wrap {
+  overflow-x: auto;
+}
+
 .chart-data-table {
   width: 100%;
   border-collapse: collapse;
@@ -813,6 +834,60 @@ textarea,
 
 .chart-data-table tfoot tr {
   background: var(--color-surface-alt);
+}
+
+/* Configuración a 320px: cada bloque cabe en su tarjeta (criterio 3 de SPEC-00).
+   Escritorio y tableta conservan las columnas originales. Va después de las
+   reglas base porque comparte especificidad con ellas. */
+@media (max-width: 767px) {
+  /* Selector de mes: la etiqueta queda arriba y los controles ocupan el ancho. */
+  .month-selector {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .month-selector-controls {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .month-selector-value {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Totales: "$23,500.00" a 28px y "Categorías con presupuesto" no caben lado a lado. */
+  .totales-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .totales-card-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  /* Fila de categoría: las cuatro acciones (~300px) pasan debajo del nombre. */
+  .categoria-row {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+
+  .categoria-row-actions {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+
+  /* Gráficas: sin los 40px laterales que el navegador da a <figure>, y la fila
+     de barras (120px + 150px fijos) pasa a etiqueta / barra / valor apilados. */
+  .dona-chart,
+  .barras-chart {
+    margin-inline: 0;
+  }
+
+  .barras-chart-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
 }
 
 /* Utility */

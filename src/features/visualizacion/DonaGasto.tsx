@@ -45,7 +45,10 @@ export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
     .join(', ');
 
   return (
-    <figure role="img" aria-label={`Gasto del mes: ${label}`} style={{ margin: 0, display: 'grid', gap: '1rem' }}>
+    // `minmax(0, 1fr)` en la figura y en la leyenda: con columna implícita, el
+    // nombre en nowrap más los montos fijaban un mínimo de ~360px y la tarjeta
+    // desbordaba a 320px. Así el nombre se recorta con elipsis dentro de su fila.
+    <figure role="img" aria-label={`Gasto del mes: ${label}`} style={{ margin: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', justifyItems: 'center' }}>
         <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true" style={{ maxWidth: '100%' }}>
           <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--color-surface-alt)" strokeWidth="18" />
@@ -79,16 +82,16 @@ export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
         </svg>
       </div>
 
-      <div style={{ display: 'grid', gap: '0.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', minWidth: 0, gap: '0.5rem' }}>
         {chartEntries.map((entry) => {
           const pct = totalSpent === 0 ? 0 : Math.round((entry.spentCents / totalSpent) * 100);
           return (
-            <div key={entry.categoryId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+            <div key={entry.categoryId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
                 <span style={{ width: '0.75rem', height: '0.75rem', borderRadius: '999px', background: colorOf(entry), display: 'inline-block' }} />
                 <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.name}</span>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', color: 'var(--color-ink-600)', fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', color: 'var(--color-ink-600)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                 <span>{formatMXN(entry.spentCents)}</span>
                 <span>{pct}%</span>
               </div>

@@ -32,54 +32,58 @@ export function ChartDataTable({ data, totalCents }: ChartDataTableProps) {
   const sortedData = [...data].sort((a, b) => b.amountCents - a.amountCents);
 
   return (
-    <table className="chart-data-table">
-      <caption>Distribución del presupuesto</caption>
-      <thead>
-        <tr>
-          <th scope="col">Categoría</th>
-          <th scope="col" style={{ textAlign: 'right' }}>
-            Monto
-          </th>
-          <th scope="col" style={{ textAlign: 'right' }}>
-            Porcentaje
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedData.map((item) => {
-          const percentage = Math.round((item.amountCents / totalCents) * 100);
-          return (
-            <tr key={item.id}>
-              <td>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: colorMap[item.colorKey],
-                      borderRadius: '2px',
-                    }}
-                    aria-hidden="true"
-                  ></span>
-                  {item.name}
-                </div>
-              </td>
-              <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(item.amountCents)}</td>
-              <td style={{ textAlign: 'right' }}>{percentage}%</td>
-            </tr>
-          );
-        })}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th scope="row">Total</th>
-          <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 'bold' }}>
-            {formatMXN(totalCents)}
-          </td>
-          <td style={{ textAlign: 'right', fontWeight: 'bold' }}>100%</td>
-        </tr>
-      </tfoot>
-    </table>
+    // Con nombres largos la tabla supera los 240px de la tarjeta a 320px; el
+    // scroll vive aquí para que no empuje la página (criterio 3 de SPEC-00).
+    <div className="chart-data-table-wrap">
+      <table className="chart-data-table">
+        <caption>Distribución del presupuesto</caption>
+        <thead>
+          <tr>
+            <th scope="col">Categoría</th>
+            <th scope="col" style={{ textAlign: 'right' }}>
+              Monto
+            </th>
+            <th scope="col" style={{ textAlign: 'right' }}>
+              Porcentaje
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedData.map((item) => {
+            const percentage = Math.round((item.amountCents / totalCents) * 100);
+            return (
+              <tr key={item.id}>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: colorMap[item.colorKey],
+                        borderRadius: '2px',
+                      }}
+                      aria-hidden="true"
+                    ></span>
+                    {item.name}
+                  </div>
+                </td>
+                <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(item.amountCents)}</td>
+                <td style={{ textAlign: 'right' }}>{percentage}%</td>
+              </tr>
+            );
+          })}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row">Total</th>
+            <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 'bold' }}>
+              {formatMXN(totalCents)}
+            </td>
+            <td style={{ textAlign: 'right', fontWeight: 'bold' }}>100%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   );
 }

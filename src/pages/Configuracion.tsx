@@ -301,7 +301,7 @@ export function Configuracion() {
         ) : (
           <>
             <section className="card" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                 <h2>Distribución</h2>
                 <Button variant="secondary" onClick={() => setShowTable(!showTable)}>
                   {showTable ? 'Ver gráfica' : 'Ver como tabla'}
