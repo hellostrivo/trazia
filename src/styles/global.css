@@ -440,3 +440,405 @@ textarea,
     scroll-behavior: auto !important;
   }
 }
+
+/* Configuración page */
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.month-selector-label {
+  font-weight: 600;
+  font-size: var(--font-size-16);
+}
+
+.month-selector-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  padding: var(--space-2);
+}
+
+.month-selector-value {
+  min-width: 10rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--color-ink-900);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+}
+
+.month-selector-value:hover {
+  background: var(--color-surface);
+}
+
+/* Totales Card */
+.totales-card {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.totales-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.totales-card-label {
+  font-size: var(--font-size-14);
+  color: var(--color-ink-600);
+  font-weight: 600;
+}
+
+.totales-card-value {
+  font-size: var(--font-size-28);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.totales-card-divider {
+  width: 1px;
+  height: 4rem;
+  background: var(--color-border);
+}
+
+/* Categorías Lista */
+.categorias-lista {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.categorias-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.categorias-list-container {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Categoría Row */
+.categoria-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  transition: background 0.2s ease;
+}
+
+.categoria-row:hover {
+  background: var(--color-surface);
+}
+
+.categoria-row-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.categoria-row-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.categoria-row-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoria-row-details {
+  font-size: var(--font-size-14);
+  color: var(--color-ink-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.categoria-row-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Archivada Section */
+.archivada-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.archivada-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.archivada-toggle:hover {
+  background: var(--color-surface);
+}
+
+.archivada-toggle-icon {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.archivada-list {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: rgba(248, 250, 249, 0.4);
+  border-radius: var(--radius-md);
+}
+
+.archivada-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.archivada-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.archivada-name {
+  font-weight: 600;
+}
+
+/* Form Note */
+.form-note {
+  padding: var(--space-4);
+  background: var(--color-surface-alt);
+  border-left: 2px solid var(--color-attention);
+  border-radius: var(--radius-md);
+}
+
+.form-note p {
+  margin: 0;
+  font-size: var(--font-size-14);
+  color: var(--color-ink-600);
+  line-height: 1.6;
+}
+
+.form-note p:not(:last-child) {
+  margin-bottom: var(--space-2);
+}
+
+/* Dialog */
+.dialog-body {
+  gap: var(--space-4);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Charts */
+.dona-chart {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.dona-chart-center-text {
+  fill: var(--color-ink-900);
+}
+
+.dona-chart-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+}
+
+.dona-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-14);
+}
+
+.dona-legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.dona-legend-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.dona-legend-percentage {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-600);
+}
+
+.dona-legend-note {
+  grid-column: 1 / -1;
+}
+
+/* Barras Chart */
+.barras-chart {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.barras-chart-container {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.barras-chart-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.barras-chart-label {
+  font-size: var(--font-size-14);
+  font-weight: 600;
+}
+
+.barras-chart-bar-container {
+  width: 100%;
+  height: 24px;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.barras-chart-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.barras-chart-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: right;
+}
+
+.barras-chart-value span:first-child {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.barras-chart-percentage {
+  font-size: var(--font-size-14);
+  color: var(--color-ink-600);
+  min-width: 3rem;
+}
+
+.barras-chart-note {
+  padding-top: var(--space-3);
+}
+
+/* Chart Data Table */
+.chart-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-14);
+}
+
+.chart-data-table caption {
+  caption-side: top;
+  text-align: left;
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+
+.chart-data-table thead {
+  background: var(--color-surface-alt);
+}
+
+.chart-data-table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chart-data-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-data-table tbody tr:hover {
+  background: var(--color-surface-alt);
+}
+
+.chart-data-table tfoot tr {
+  background: var(--color-surface-alt);
+}
+
+/* Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Color chart variables (CSS custom properties) */
+:root {
+  --color-chart-slate: var(--color-graph-slate);
+  --color-chart-sage: var(--color-graph-sage);
+  --color-chart-ochre: var(--color-graph-ochre);
+  --color-chart-clay: var(--color-graph-clay);
+  --color-chart-plum: var(--color-graph-plum);
+  --color-chart-teal: var(--color-graph-teal);
+  --color-chart-olive: var(--color-graph-olive);
+  --color-chart-stone: var(--color-graph-stone);
+  --color-chart-denim: var(--color-graph-denim);
+  --color-chart-rose: var(--color-graph-rose);
+}
+

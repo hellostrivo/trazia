@@ -9,6 +9,7 @@ import { StatusBadge } from './components/StatusBadge';
 import { Toast } from './components/Toast';
 import { MonthSwitcher } from './components/MonthSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { Configuracion } from './pages/Configuracion';
 import { useState } from 'react';
 
 function TabLink({ to, label }: { to: string; label: string }) {
@@ -137,6 +138,37 @@ function NotFound() {
   );
 }
 
+function ConfiguracionShell() {
+  return (
+    <div className="app-shell">
+      <a href="#main-content" className="skip-link">
+        {strings.skipToContent}
+      </a>
+
+      <div className="app-layout">
+        <aside className="sidebar" aria-label="Navegación principal">
+          <div className="brand">{strings.appName}</div>
+          <nav className="nav" aria-label="Secciones">
+            {navigation.map((item) => (
+              <TabLink key={item.to} to={item.to} label={item.label} />
+            ))}
+          </nav>
+        </aside>
+
+        <main id="main-content" role="main">
+          <Configuracion />
+        </main>
+      </div>
+
+      <nav className="bottom-nav" aria-label="Navegación móvil">
+        {navigation.map((item) => (
+          <TabLink key={item.to} to={item.to} label={item.label} />
+        ))}
+      </nav>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -145,7 +177,7 @@ export default function App() {
         <Route path="/captura" element={<AppShell />} />
         <Route path="/visualizacion" element={<AppShell />} />
         <Route path="/movimientos" element={<AppShell />} />
-        <Route path="/configuracion" element={<AppShell />} />
+        <Route path="/configuracion" element={<ConfiguracionShell />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ErrorBoundary>
