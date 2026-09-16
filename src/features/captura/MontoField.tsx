@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatMoneyInput } from '../../domain/money';
 
 interface Props {
   value: string;
@@ -10,8 +9,9 @@ interface Props {
 export const MontoField = React.forwardRef<HTMLInputElement, Props>(({ value, onChange, error }, ref) => {
   return (
     <div className="field">
-      <label>Monto</label>
+      <label htmlFor="monto-field">Monto</label>
       <input
+        id="monto-field"
         ref={ref}
         name="monto"
         inputMode="decimal"

@@ -9,10 +9,12 @@ interface Props {
 }
 
 export function CategoriaChips({ categories, value, onChange, error }: Props) {
+  const groupLabelId = 'categoria-chips-label';
+
   return (
     <div className="field">
-      <label>Categoría</label>
-      <div role="radiogroup" aria-label="Categorías" className="categoria-chips" style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
+      <span id={groupLabelId} style={{ fontWeight: 600 }}>Categoría</span>
+      <div role="radiogroup" aria-labelledby={groupLabelId} aria-label="Categorías" className="categoria-chips" style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
         {categories.map((cat) => (
           <button
             key={cat.id}

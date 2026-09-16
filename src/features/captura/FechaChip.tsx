@@ -21,12 +21,12 @@ export function FechaChip({ value, onChange, error }: Props) {
 
   return (
     <div className="field">
-      <label>Fecha</label>
+      <label htmlFor={showInput ? 'fecha-chip-input' : undefined}>Fecha</label>
       <div className="row" style={{ gap: '0.5rem', alignItems: 'center' }}>
         <button type="button" onClick={() => onChange(today())} aria-label="Hoy">Hoy</button>
         <button type="button" onClick={() => { setShowInput((s) => !s); setTimeout(() => inputRef.current?.focus(), 50); }} aria-label="Cambiar">Cambiar</button>
         {showInput && (
-          <input ref={inputRef} type="date" max={max} value={value} onChange={handleChange} aria-invalid={!!error} aria-describedby={error ? 'fecha-error' : undefined} />
+          <input id="fecha-chip-input" ref={inputRef} type="date" max={max} value={value} onChange={handleChange} aria-invalid={!!error} aria-describedby={error ? 'fecha-error' : undefined} />
         )}
       </div>
       {error && (

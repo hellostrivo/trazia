@@ -88,7 +88,8 @@ export default function Captura() {
       setConcept('');
       setCategoryId(null);
       amountRef.current?.focus();
-    } catch (err) {
+    } catch (error) {
+      console.error('No se pudo guardar el gasto', error);
       setToast({ open: true, message: 'No se pudo guardar el gasto. Intenta de nuevo.' });
     } finally {
       setProcessing(false);

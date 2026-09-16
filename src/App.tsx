@@ -10,6 +10,7 @@ import { Toast } from './components/Toast';
 import { MonthSwitcher } from './components/MonthSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Configuracion } from './pages/Configuracion';
+import Visualizacion from './pages/Visualizacion';
 import { useState } from 'react';
 
 function TabLink({ to, label }: { to: string; label: string }) {
@@ -175,7 +176,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/captura" replace />} />
         <Route path="/captura" element={<AppShell />} />
-        <Route path="/visualizacion" element={<AppShell />} />
+        <Route path="/visualizacion" element={<Visualizacion />} />
         <Route path="/movimientos" element={<AppShell />} />
         <Route path="/configuracion" element={<ConfiguracionShell />} />
         <Route path="*" element={<NotFound />} />

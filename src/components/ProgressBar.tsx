@@ -9,8 +9,15 @@ export function ProgressBar({ value, max = 100, label }: ProgressBarProps) {
   const percentage = max === 0 ? 0 : (safeValue / max) * 100;
 
   return (
-    <div aria-label={label ?? 'Progreso'}>
-      <div className="progress-bar" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={safeValue}>
+    <div>
+      <div
+        className="progress-bar"
+        role="progressbar"
+        aria-label={label ?? 'Progreso'}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-valuenow={safeValue}
+      >
         <span style={{ width: `${percentage}%` }} />
       </div>
     </div>

@@ -9,8 +9,9 @@ interface Props {
 export const ConceptoField = React.forwardRef<HTMLInputElement, Props>(({ value, onChange, error }, ref) => {
   return (
     <div className="field">
-      <label>Concepto</label>
+      <label htmlFor="concepto-field">Concepto</label>
       <input
+        id="concepto-field"
         ref={ref}
         name="concepto"
         maxLength={80}
