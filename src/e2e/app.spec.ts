@@ -7,7 +7,7 @@ test.describe('TRAZIA shell', () => {
 
     await expect(page.getByRole('link', { name: 'Captura' })).toBeVisible();
     await page.getByRole('link', { name: 'Visualización' }).click();
-    await expect(page).toHaveURL(/\/visualizacion$/);
+    await expect(page).toHaveURL(/\/visualizacion\?mes=\d{4}-\d{2}$/);
 
     const horizontal = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     expect(horizontal).toBeFalsy();

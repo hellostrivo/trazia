@@ -18,5 +18,9 @@ export default defineConfig({
     css: true,
     include: ['src/**/*.test.{ts,tsx}'],
     exclude: ['src/e2e/**', 'node_modules/**', 'dist/**'],
+    coverage: {
+      // Type-only declarations are not executable code and should not count against runtime coverage.
+      exclude: ['src/domain/types.ts'],
+    },
   },
 });

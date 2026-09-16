@@ -21,6 +21,14 @@ describe('repositories integration', () => {
     expect((await getSettings()).seededAt).not.toBeNull();
   });
 
+  it('seeds categories exactly once even with parallel invocations', async () => {
+    await Promise.all([ensureSeedCategories(), ensureSeedCategories()]);
+
+    const categories = await listCategories();
+    expect(categories).toHaveLength(8);
+    expect((await getSettings()).seededAt).not.toBeNull();
+  });
+
   it('blocks category deletion when in use', async () => {
     await ensureSeedCategories();
     const category = (await listCategories())[0];
@@ -33,10 +41,10 @@ describe('repositories integration', () => {
       date: '2026-09-10',
     });
 
-    await expect(removeCategory(category.id)).rejects.toThrow();
+    await expect(removeCategory(category.id)).rejects.toThrow('La categoría está en uso');
   });
 
-  it('upserts a budget version per category and month', async () => {
+  it('upserts a budget version per category and month without duplicating rows', async () => {
     await ensureSeedCategories();
     const category = (await listCategories())[0];
     if (!category) throw new Error('No category found');
