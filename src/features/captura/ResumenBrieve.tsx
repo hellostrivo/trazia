@@ -1,10 +1,12 @@
+import { parseLocalDate } from '../../domain/dates';
 import { formatMXN } from '../../domain/money';
 import type { Transaction } from '../../domain/types';
 
 export function ResumenBrieve({ monthKey, transactions }: { monthKey: string; transactions: Transaction[] }) {
   const spent = transactions.reduce((s, t) => s + t.amountCents, 0);
 
-  const monthLabel = new Date(monthKey + '-01').toLocaleString('es-MX', { month: 'long' });
+  // `new Date('2026-09-01')` se interpreta en UTC y en husos negativos cae al mes anterior.
+  const monthLabel = parseLocalDate(`${monthKey}-01`).toLocaleString('es-MX', { month: 'long' });
 
   return (
     <div className="resumen-brieve">

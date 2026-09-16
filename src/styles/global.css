@@ -842,3 +842,20 @@ textarea,
   --color-chart-rose: var(--color-graph-rose);
 }
 
+
+/* Acción dentro del toast (Deshacer) */
+.toast-action {
+  margin-left: var(--space-3);
+  padding: 0.25rem var(--space-3);
+  min-height: 2rem;
+  border: 1px solid var(--color-surface);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-surface);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toast-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

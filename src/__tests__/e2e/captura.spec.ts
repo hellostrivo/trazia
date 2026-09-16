@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Captura', () => {
   test('capturar un gasto básico y deshacer', async ({ page }) => {
-    await page.goto('/captura');
+    await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'Captura' })).toBeVisible();
 

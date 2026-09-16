@@ -1,7 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './src/e2e',
+  testDir: './src',
+  // El shell vive en src/e2e y las pruebas por SPEC en src/__tests__/e2e.
+  testMatch: ['e2e/*.spec.ts', '__tests__/e2e/*.spec.ts'],
   timeout: 30_000,
   fullyParallel: true,
   reporter: 'list',

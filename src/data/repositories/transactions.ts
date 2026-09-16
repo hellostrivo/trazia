@@ -45,3 +45,13 @@ export async function upsertTransaction(input: z.infer<typeof transactionInputSc
 export async function deleteTransaction(id: string): Promise<void> {
   await db.transactions.delete(id);
 }
+
+/**
+ * Restaura un movimiento eliminado conservando su `id` y su `createdAt`
+ * originales (SPEC-05, criterio 2): reescribe el registro tal cual estaba.
+ */
+export async function restoreTransaction(transaction: Transaction): Promise<Transaction> {
+  const record = transactionSchema.parse(transaction);
+  await db.transactions.put(record);
+  return record;
+}

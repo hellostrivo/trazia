@@ -6,6 +6,19 @@ function compareRows(a: MonthSummaryRow, b: MonthSummaryRow) {
   return b.spentCents - a.spentCents;
 }
 
+/**
+ * `availableCents` es una diferencia con signo (`z.number().int()` en el dominio),
+ * mientras que `formatMXN` solo acepta centavos no negativos. La capa de
+ * presentación decide el signo: SPEC-04 §Estados pide el texto ocre
+ * "Por encima de lo planeado: $X" (T-007), sin iconos de alarma.
+ */
+export function formatDisponible(availableCents: number): { text: string; isOver: boolean } {
+  if (availableCents >= 0) {
+    return { text: formatMXN(availableCents), isOver: false };
+  }
+  return { text: `Por encima de lo planeado: ${formatMXN(Math.abs(availableCents))}`, isOver: true };
+}
+
 export function TablaDetalle({
   summary,
   order,
@@ -17,6 +30,7 @@ export function TablaDetalle({
   onOrderChange: (next: 'mayor-gasto' | 'configurado') => void;
 }) {
   const rows = order === 'mayor-gasto' ? [...summary.rows].sort(compareRows) : [...summary.rows].sort((a, b) => a.name.localeCompare(b.name));
+  const totalDisponible = formatDisponible(summary.totalAvailableCents);
 
   return (
     <section aria-label="Detalle del mes" style={{ display: 'grid', gap: '1rem' }}>
@@ -37,7 +51,8 @@ export function TablaDetalle({
           </thead>
           <tbody>
             {rows.map((row) => {
-              const tone = row.availableCents >= 0 ? 'var(--color-ink-900)' : 'var(--color-attention)';
+              const disponible = formatDisponible(row.availableCents);
+              const tone = disponible.isOver ? 'var(--color-attention)' : 'var(--color-ink-900)';
               return (
                 <tr key={row.categoryId} style={{ borderTop: '1px solid var(--color-border)' }}>
                   <td style={{ padding: '0.75rem 0.5rem' }}>
@@ -49,7 +64,7 @@ export function TablaDetalle({
                   <td style={{ padding: '0.75rem 0.5rem', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(row.budgetCents)}</td>
                   <td style={{ padding: '0.75rem 0.5rem', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(row.spentCents)}</td>
                   <td style={{ padding: '0.75rem 0.5rem', color: tone, fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-                    {row.availableCents >= 0 ? formatMXN(row.availableCents) : `-${formatMXN(Math.abs(row.availableCents))}`}
+                    {disponible.text}
                   </td>
                 </tr>
               );
@@ -58,19 +73,29 @@ export function TablaDetalle({
               <td style={{ padding: '0.75rem 0.5rem' }}>Total</td>
               <td style={{ padding: '0.75rem 0.5rem', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(summary.totalBudgetCents)}</td>
               <td style={{ padding: '0.75rem 0.5rem', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(summary.totalSpentCents)}</td>
-              <td style={{ padding: '0.75rem 0.5rem', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(summary.totalAvailableCents)}</td>
+              <td
+                style={{
+                  padding: '0.75rem 0.5rem',
+                  fontVariantNumeric: 'tabular-nums',
+                  color: totalDisponible.isOver ? 'var(--color-attention)' : 'var(--color-ink-900)',
+                }}
+              >
+                {totalDisponible.text}
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div style={{ display: 'grid', gap: '0.75rem', paddingTop: '0.5rem' }}>
-        {rows.map((row) => (
+        {rows.map((row) => {
+          const disponible = formatDisponible(row.availableCents);
+          return (
           <div key={row.categoryId} style={{ display: 'grid', gap: '0.25rem', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: '0.75rem', background: 'var(--color-surface-alt)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
               <strong>{row.name}</strong>
-              <span style={{ color: row.availableCents >= 0 ? 'var(--color-ink-900)' : 'var(--color-attention)' }}>
-                {row.availableCents >= 0 ? formatMXN(row.availableCents) : `-${formatMXN(Math.abs(row.availableCents))}`}
+              <span style={{ color: disponible.isOver ? 'var(--color-attention)' : 'var(--color-ink-900)' }}>
+                {disponible.text}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', color: 'var(--color-ink-600)' }}>
@@ -82,7 +107,8 @@ export function TablaDetalle({
               <span>{formatMXN(row.spentCents)}</span>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

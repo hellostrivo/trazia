@@ -37,13 +37,14 @@ export default function Visualizacion() {
 
   const categoriesQuery = useLiveQuery(() => listCategories());
   const budgetsQuery = useLiveQuery(() => listBudgets());
-  const transactionsQuery = useLiveQuery(() => listTransactionsByMonth(selectedMonth));
+  const transactionsQuery = useLiveQuery(() => listTransactionsByMonth(selectedMonth), [selectedMonth]);
 
   const changeMonth = (direction: 'prev' | 'next') => {
     const nextKey = addMonths(selectedMonth, direction === 'prev' ? -1 : 1);
     if (direction === 'next' && nextKey > currentMonth) return;
-    const nextUrl = `${location.pathname}?mes=${nextKey}`;
-    navigate(nextUrl, { replace: true });
+    // El estado es la fuente de verdad y el efecto de abajo sincroniza la URL.
+    // Navegar aquí hacía que ambos efectos se pelearan y el mes oscilara.
+    setSelectedMonth(nextKey);
   };
 
   const summary = useMemo(() => {
@@ -86,7 +87,7 @@ export default function Visualizacion() {
         <EmptyState
           title={`Aún no hay movimientos en ${selectedMonth}`}
           description="Registra un gasto para empezar a seguir el mes."
-          action={<Button onClick={() => navigate('/captura')}>Registrar un gasto</Button>}
+          action={<Button onClick={() => navigate('/')}>Registrar un gasto</Button>}
         />
       </div>
     );

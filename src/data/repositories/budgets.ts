@@ -10,7 +10,10 @@ export const budgetInputSchema = z.object({
 });
 
 export async function listBudgets(): Promise<BudgetVersion[]> {
-  return db.budgetVersions.orderBy('effectiveFrom').toArray();
+  // `effectiveFrom` no es un índice propio (sólo existe el compuesto
+  // [categoryId+effectiveFrom]), así que el orden se resuelve en memoria.
+  const versions = await db.budgetVersions.toArray();
+  return versions.sort((left, right) => left.effectiveFrom.localeCompare(right.effectiveFrom));
 }
 
 export async function getBudgetForCategory(categoryId: string): Promise<BudgetVersion[]> {

@@ -16,7 +16,7 @@ import { UltimosMovimientos } from '../features/captura/UltimosMovimientos';
 export default function Captura() {
   const monthKey = monthKeyOf(today());
   const categoriesQuery = useLiveQuery(() => listCategories());
-  const transactionsQuery = useLiveQuery(() => listTransactionsByMonth(monthKey));
+  const transactionsQuery = useLiveQuery(() => listTransactionsByMonth(monthKey), [monthKey]);
 
   const [amount, setAmount] = useState('');
   const [concept, setConcept] = useState('');
@@ -132,12 +132,12 @@ export default function Captura() {
         <UltimosMovimientos transactions={(transactionsQuery.data ?? [])} />
       </div>
 
-      <Toast message={toast.message} open={toast.open} onClose={() => setToast({ open: false, message: '' })} />
-      {toast.open && (
-        <div style={{ position: 'fixed', right: 16, bottom: 16 }}>
-          <Button variant="ghost" onClick={handleUndo}>Deshacer</Button>
-        </div>
-      )}
+      <Toast
+        message={toast.message}
+        open={toast.open}
+        onClose={() => setToast({ open: false, message: '' })}
+        {...(toast.undoId ? { action: { label: 'Deshacer', onAction: handleUndo } } : {})}
+      />
     </div>
   );
 }
