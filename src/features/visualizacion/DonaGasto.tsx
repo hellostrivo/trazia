@@ -1,4 +1,5 @@
 import { formatMXN } from '../../domain/money';
+import { OTHERS_LABEL } from '../../domain/distribution';
 import type { MonthSummaryRow } from '../../domain/types';
 
 const colorMap = {
@@ -14,6 +15,13 @@ const colorMap = {
   rose: 'var(--color-graph-rose)',
 } as const;
 
+const OTHERS_ID = 'otras-categorias';
+
+/** El grupo agregado usa su propio token para no coincidir con ninguna categoría (p. ej. "Otros" = stone). */
+function colorOf(entry: Pick<MonthSummaryRow, 'categoryId' | 'colorKey'>): string {
+  return entry.categoryId === OTHERS_ID ? 'var(--color-graph-otros)' : colorMap[entry.colorKey];
+}
+
 export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
   const categories = [...rows].filter((row) => row.spentCents > 0).sort((a, b) => b.spentCents - a.spentCents);
 
@@ -24,7 +32,7 @@ export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
   const top = categories.slice(0, 5);
   const others = categories.slice(5);
   const chartEntries = others.length > 0
-    ? [...top, { categoryId: 'otros', name: 'Otras', spentCents: others.reduce((sum, item) => sum + item.spentCents, 0), colorKey: 'stone' as const, budgetCents: 0, availableCents: 0, ratio: null, status: 'sin-actividad', shareOfSpent: 0 }]
+    ? [...top, { categoryId: OTHERS_ID, name: OTHERS_LABEL, spentCents: others.reduce((sum, item) => sum + item.spentCents, 0), colorKey: 'stone' as const, budgetCents: 0, availableCents: 0, ratio: null, status: 'sin-actividad', shareOfSpent: 0 }]
     : top;
 
   const totalSpent = chartEntries.reduce((sum, item) => sum + item.spentCents, 0);
@@ -51,7 +59,7 @@ export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
                 cy="110"
                 r={radius}
                 fill="none"
-                stroke={colorMap[entry.colorKey] ?? 'var(--color-graph-otros)'}
+                stroke={colorOf(entry)}
                 strokeWidth="18"
                 strokeDasharray={dash}
                 strokeDashoffset={-strokeOffset}
@@ -77,7 +85,7 @@ export function DonaGasto({ rows }: { rows: MonthSummaryRow[] }) {
           return (
             <div key={entry.categoryId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
-                <span style={{ width: '0.75rem', height: '0.75rem', borderRadius: '999px', background: colorMap[entry.colorKey] ?? 'var(--color-graph-otros)', display: 'inline-block' }} />
+                <span style={{ width: '0.75rem', height: '0.75rem', borderRadius: '999px', background: colorOf(entry), display: 'inline-block' }} />
                 <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{entry.name}</span>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', color: 'var(--color-ink-600)', fontVariantNumeric: 'tabular-nums' }}>

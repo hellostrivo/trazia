@@ -1,4 +1,5 @@
 import { formatMXN } from '../../domain/money';
+import { groupDonutSlices, OTHERS_LABEL } from '../../domain/distribution';
 import type { Cents, ChartColorKey } from '../../domain/types';
 
 interface DonaChartProps {
@@ -24,23 +25,28 @@ const colorMap: Record<ChartColorKey, string> = {
   rose: '#A86A7B',
 };
 
+const OTHERS_ID = 'otras-categorias';
+
+/** El grupo agregado usa su propio token para no coincidir con ninguna categoría (p. ej. "Otros" = stone). */
+function colorOf(item: { id: string; colorKey: ChartColorKey }): string {
+  return item.id === OTHERS_ID ? 'var(--color-graph-otros)' : colorMap[item.colorKey];
+}
+
 export function DonaChart({ data, totalCents }: DonaChartProps) {
   if (totalCents === 0 || data.length === 0) {
     return null;
   }
 
-  // Mantener máximo 6 categorías principales + Otras
-  const topCategories = data.slice(0, 6);
-  const otherCategories = data.slice(6);
-  const otherTotal = otherCategories.reduce((sum, cat) => sum + cat.amountCents, 0);
+  // Regla compartida con el PDF del plan (SPEC-06): 6 principales por monto + agregado, sin las de $0.
+  const { main: topCategories, othersCents: otherTotal } = groupDonutSlices(data);
 
   const chartData = [
     ...topCategories,
     ...(otherTotal > 0
       ? [
           {
-            id: 'otros',
-            name: 'Otras',
+            id: OTHERS_ID,
+            name: OTHERS_LABEL,
             colorKey: 'stone' as ChartColorKey,
             amountCents: otherTotal,
           },
@@ -89,7 +95,7 @@ export function DonaChart({ data, totalCents }: DonaChartProps) {
 
     return {
       path: pathData,
-      color: colorMap[item.colorKey],
+      color: colorOf(item),
       label: item.name,
       percentage: Math.round(percentage * 100),
     };
@@ -123,7 +129,7 @@ export function DonaChart({ data, totalCents }: DonaChartProps) {
           <div key={item.id} className="dona-legend-item">
             <span
               className="dona-legend-color"
-              style={{ backgroundColor: colorMap[item.colorKey] }}
+              style={{ backgroundColor: colorOf(item) }}
               aria-hidden="true"
             ></span>
             <span className="dona-legend-label">{item.name}</span>

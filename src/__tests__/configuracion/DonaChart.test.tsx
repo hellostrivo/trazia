@@ -37,9 +37,14 @@ describe('DonaChart', () => {
       amountCents: 10000,
     }));
 
-    render(<DonaChart data={manyCategories} totalCents={80000} />);
+    const { container } = render(<DonaChart data={manyCategories} totalCents={80000} />);
 
-    expect(screen.getByText('Otras')).toBeInTheDocument();
+    expect(screen.getByText('Otras categorías')).toBeInTheDocument();
+    // El agregado usa su propio token, no el color de ninguna categoría (todas son stone aquí).
+    const items = Array.from(container.querySelectorAll('.dona-legend-item'));
+    const others = items.find((item) => item.textContent?.includes('Otras categorías'));
+    const swatch = others?.querySelector<HTMLElement>('.dona-legend-color');
+    expect(swatch?.style.backgroundColor).toBe('var(--color-graph-otros)');
   });
 
   it('shows percentage and rounding note', () => {

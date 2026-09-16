@@ -88,7 +88,7 @@ describe('buildBudgetPdfData', () => {
     expect(data.table.map((row) => row.name)).toEqual(['Pequeña', 'Grande']);
   });
 
-  it('agrupa a partir de la séptima categoría en "Otras" y lista las que no tienen presupuesto', () => {
+  it('agrupa a partir de la séptima categoría en "Otras categorías" y lista las que no tienen presupuesto', () => {
     const data = buildBudgetPdfData(
       makeSummary([
         ['A', 80000],
@@ -105,7 +105,15 @@ describe('buildBudgetPdfData', () => {
     );
 
     expect(data.donut).toHaveLength(7);
-    expect(data.donut.map((row) => row.name)).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'Otras']);
+    expect(data.donut.map((row) => row.name)).toEqual([
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'Otras categorías',
+    ]);
     const others = data.donut[6];
     expect(others?.budgetCents).toBe(30000);
     expect(others?.color).toBe(OTHERS_COLOR);
@@ -115,7 +123,7 @@ describe('buildBudgetPdfData', () => {
     expect(data.unbudgeted).toEqual(['Sin plan']);
   });
 
-  it('con seis categorías o menos no añade "Otras"', () => {
+  it('con seis categorías o menos no añade "Otras categorías"', () => {
     const data = buildBudgetPdfData(
       makeSummary([
         ['A', 1000],
@@ -127,7 +135,7 @@ describe('buildBudgetPdfData', () => {
       ]),
       generatedAt,
     );
-    expect(data.donut.map((row) => row.name)).not.toContain('Otras');
+    expect(data.donut.map((row) => row.name)).not.toContain('Otras categorías');
     expect(data.donut).toHaveLength(6);
   });
 
@@ -143,5 +151,20 @@ describe('buildBudgetPdfData', () => {
   it('el nombre del archivo y la etiqueta del mes siguen el formato del SPEC', () => {
     expect(budgetPdfFilename('2026-09')).toBe('trazia-plan-2026-09.pdf');
     expect(formatPdfMonthLabel('2026-01')).toBe('Enero 2026');
+  });
+});
+
+describe('color del grupo agregado', () => {
+  it('OTHERS_COLOR es el mismo valor que --color-graph-otros en tokens.css', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync('src/styles/tokens.css', 'utf8');
+    const token = /--color-graph-otros:\s*(#[0-9a-f]{6})/i.exec(css)?.[1];
+    expect(token?.toLowerCase()).toBe(OTHERS_COLOR.toLowerCase());
+  });
+
+  it('no coincide con ninguno de los 10 colores de categoría', () => {
+    expect(Object.values(CHART_COLORS).map((c) => c.toLowerCase())).not.toContain(
+      OTHERS_COLOR.toLowerCase(),
+    );
   });
 });

@@ -1,4 +1,5 @@
-import type { ChartColorKey, MonthKey, MonthSummary } from '../../domain/types';
+import { groupDonutSlices, OTHERS_LABEL } from '../../domain/distribution';
+import type { ChartColorKey, MonthKey, MonthSummary, MonthSummaryRow } from '../../domain/types';
 
 /** Colores de las gráficas: `--color-graph-*` en `src/styles/tokens.css` (tema claro). */
 export const CHART_COLORS: Record<ChartColorKey, string> = {
@@ -14,11 +15,8 @@ export const CHART_COLORS: Record<ChartColorKey, string> = {
   rose: '#a86a7b',
 };
 
-/** `--color-graph-otros`. */
-export const OTHERS_COLOR = '#b8b1a6';
-
-/** Máximo de rebanadas propias en la dona; el resto se agrupa en "Otras". */
-export const DONUT_MAX_SLICES = 6;
+/** `--color-graph-otros` en `tokens.css`: gris frío, fuera de la paleta de categorías. */
+export const OTHERS_COLOR = '#a5b3c4';
 
 export interface BudgetPdfRow {
   name: string;
@@ -38,7 +36,7 @@ export interface BudgetPdfData {
   categoriesWithBudget: number;
   /** Categorías con presupuesto en el orden configurado. */
   table: BudgetPdfRow[];
-  /** Hasta seis categorías principales (mayor a menor) más "Otras". */
+  /** Hasta seis categorías principales (mayor a menor) más el grupo agregado. */
   donut: BudgetPdfRow[];
   /** Todas las categorías con presupuesto, de mayor a menor. */
   bars: BudgetPdfRow[];
@@ -80,32 +78,34 @@ function sharePercentOf(cents: number, totalCents: number): number {
 export function buildBudgetPdfData(summary: MonthSummary, generatedAt: Date): BudgetPdfData {
   const totalBudgetCents = summary.totalBudgetCents;
 
-  const table: BudgetPdfRow[] = summary.rows
-    .filter((row) => row.budgetCents > 0)
-    .map((row) => ({
-      name: row.name,
-      color: CHART_COLORS[row.colorKey],
-      budgetCents: row.budgetCents,
-      sharePercent: sharePercentOf(row.budgetCents, totalBudgetCents),
-    }));
+  const toRow = (row: MonthSummaryRow): BudgetPdfRow => ({
+    name: row.name,
+    color: CHART_COLORS[row.colorKey],
+    budgetCents: row.budgetCents,
+    sharePercent: sharePercentOf(row.budgetCents, totalBudgetCents),
+  });
+
+  const table = summary.rows.filter((row) => row.budgetCents > 0).map(toRow);
 
   const bars = [...table].sort((left, right) => right.budgetCents - left.budgetCents);
 
-  const main = bars.slice(0, DONUT_MAX_SLICES);
-  const rest = bars.slice(DONUT_MAX_SLICES);
-  const restCents = rest.reduce((sum, row) => sum + row.budgetCents, 0);
-  const donut: BudgetPdfRow[] =
-    restCents > 0
+  // Misma regla que DonaChart en Configuración (criterio 5 de SPEC-06).
+  const { main, othersCents } = groupDonutSlices(
+    summary.rows.map((row) => ({ row, amountCents: row.budgetCents })),
+  );
+  const donut: BudgetPdfRow[] = [
+    ...main.map(({ row }) => toRow(row)),
+    ...(othersCents > 0
       ? [
-          ...main,
           {
-            name: 'Otras',
+            name: OTHERS_LABEL,
             color: OTHERS_COLOR,
-            budgetCents: restCents,
-            sharePercent: sharePercentOf(restCents, totalBudgetCents),
+            budgetCents: othersCents,
+            sharePercent: sharePercentOf(othersCents, totalBudgetCents),
           },
         ]
-      : main;
+      : []),
+  ];
 
   const unbudgeted = summary.rows.filter((row) => row.budgetCents === 0).map((row) => row.name);
 

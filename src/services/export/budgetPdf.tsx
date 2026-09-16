@@ -205,10 +205,13 @@ export function BudgetPdfDocument({ data }: { data: BudgetPdfData }) {
           </View>
         </View>
 
+        {/* Los títulos van sueltos bajo Page: dentro de su sección serían el primer hijo y
+            react-pdf nunca salta de página por el primer hijo, así que `minPresenceAhead`
+            no evitaría un título huérfano al pie. */}
+        <Text style={styles.sectionTitle} minPresenceAhead={120}>
+          Presupuesto por categoría
+        </Text>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle} minPresenceAhead={120}>
-            Presupuesto por categoría
-          </Text>
           <View style={styles.tableHead}>
             <Text style={styles.colCategory}>Categoría</Text>
             <Text style={styles.colAmount}>Presupuesto</Text>
@@ -231,10 +234,10 @@ export function BudgetPdfDocument({ data }: { data: BudgetPdfData }) {
           </View>
         </View>
 
+        <Text style={styles.sectionTitle} minPresenceAhead={120}>
+          De mayor a menor
+        </Text>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle} minPresenceAhead={120}>
-            De mayor a menor
-          </Text>
           {data.bars.map((row) => (
             <View key={row.name} style={styles.barRow} wrap={false}>
               <Text style={styles.barLabel}>{row.name}</Text>
