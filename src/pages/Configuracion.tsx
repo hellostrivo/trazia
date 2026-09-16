@@ -7,6 +7,7 @@ import { TotalesCard } from '../features/configuracion/TotalesCard';
 import { DonaChart } from '../features/configuracion/DonaChart';
 import { BarrasChart } from '../features/configuracion/BarrasChart';
 import { ChartDataTable } from '../features/configuracion/ChartDataTable';
+import { PlanPdfSection } from '../features/configuracion/PlanPdfSection';
 import { Button } from '../components/Button';
 import { Dialog } from '../components/Dialog';
 import { Toast } from '../components/Toast';
@@ -316,6 +317,9 @@ export function Configuracion() {
             </section>
           </>
         )}
+
+        {/* Plan en PDF */}
+        <PlanPdfSection categories={activeCategories} versions={allBudgets} />
 
         {/* Archivadas */}
         {archivedCategories.length > 0 && (

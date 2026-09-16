@@ -13,6 +13,7 @@ import { TarjetaPrincipal } from '../features/visualizacion/TarjetaPrincipal';
 import { DonaGasto } from '../features/visualizacion/DonaGasto';
 import { BarrasPlanVsGasto } from '../features/visualizacion/BarrasPlanVsGasto';
 import { TablaDetalle } from '../features/visualizacion/TablaDetalle';
+import { ExportarExcelDialog } from '../features/visualizacion/ExportarExcelDialog';
 import type { MonthKey } from '../domain/types';
 
 function getMonthFromQuery(search: string, fallback: MonthKey): MonthKey {
@@ -67,28 +68,45 @@ export default function Visualizacion() {
   }, [selectedMonth, location.pathname, location.search, navigate]);
 
   const [order, setOrder] = useState<'mayor-gasto' | 'configurado'>('mayor-gasto');
+  const [exportOpen, setExportOpen] = useState(false);
 
   if (categoriesQuery.loading || budgetsQuery.loading || transactionsQuery.loading || !summary) {
     return <div className="page-shell"><p>Cargando visualización...</p></div>;
   }
+
+  const exportDialog = (
+    <ExportarExcelDialog
+      open={exportOpen}
+      onClose={() => setExportOpen(false)}
+      monthKey={selectedMonth}
+      monthTransactions={transactionsQuery.data ?? []}
+      categories={categoriesQuery.data ?? []}
+    />
+  );
 
   if (summary.rows.length === 0 && summary.totalSpentCents === 0) {
     return (
       <div className="page-shell">
         <header className="page-header">
           <h1>Visualización</h1>
-          <MonthSwitcher
-            label="Seleccionar mes"
-            value={formatMonthLabel(selectedMonth)}
-            onChange={changeMonth}
-            disableNext={selectedMonth >= currentMonth}
-          />
+          <div className="row" style={{ justifyContent: 'flex-end' }}>
+            <MonthSwitcher
+              label="Seleccionar mes"
+              value={formatMonthLabel(selectedMonth)}
+              onChange={changeMonth}
+              disableNext={selectedMonth >= currentMonth}
+            />
+            <Button variant="secondary" onClick={() => setExportOpen(true)}>
+              Exportar a Excel
+            </Button>
+          </div>
         </header>
         <EmptyState
           title={`Aún no hay movimientos en ${selectedMonth}`}
           description="Registra un gasto para empezar a seguir el mes."
           action={<Button onClick={() => navigate('/')}>Registrar un gasto</Button>}
         />
+        {exportDialog}
       </div>
     );
   }
@@ -97,12 +115,17 @@ export default function Visualizacion() {
     <div className="page-shell">
       <header className="page-header">
         <h1>Visualización</h1>
-        <MonthSwitcher
-          label="Seleccionar mes"
-          value={formatMonthLabel(selectedMonth)}
-          onChange={changeMonth}
-          disableNext={selectedMonth >= currentMonth}
-        />
+        <div className="row" style={{ justifyContent: 'flex-end' }}>
+          <MonthSwitcher
+            label="Seleccionar mes"
+            value={formatMonthLabel(selectedMonth)}
+            onChange={changeMonth}
+            disableNext={selectedMonth >= currentMonth}
+          />
+          <Button variant="secondary" onClick={() => setExportOpen(true)}>
+            Exportar a Excel
+          </Button>
+        </div>
       </header>
 
       <div className="stack" style={{ maxWidth: '72rem' }}>
@@ -124,6 +147,7 @@ export default function Visualizacion() {
           <TablaDetalle summary={summary} monthKey={selectedMonth} order={order} onOrderChange={setOrder} />
         </section>
       </div>
+      {exportDialog}
     </div>
   );
 }

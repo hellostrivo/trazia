@@ -3,6 +3,12 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    // Sólo se cargan con `import()`, así que Vite no los descubre al arrancar.
+    // Sin esto, la primera exportación en desarrollo dispara una re-optimización
+    // y una recarga de página a mitad de la descarga (afecta a los E2E).
+    include: ['exceljs', '@react-pdf/renderer'],
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,

@@ -36,9 +36,11 @@ test.describe('Configuración', () => {
   test('selector de mes funciona correctamente', async ({ page }) => {
     await page.goto('/configuracion');
 
-    // Verificar que hay botones de navegación del mes
-    const prevButton = page.locator('button:has-text("←")');
-    const nextButton = page.locator('button:has-text("→")');
+    // Verificar que hay botones de navegación del mes.
+    // Se acota al selector de la cabecera: desde SPEC-06, "Plan en PDF" tiene su propio selector.
+    const header = page.getByRole('group', { name: 'Presupuesto de' });
+    const prevButton = header.getByRole('button', { name: 'Mes anterior' });
+    const nextButton = header.getByRole('button', { name: 'Mes siguiente' });
 
     await expect(prevButton).toBeVisible();
     await expect(nextButton).toBeVisible();

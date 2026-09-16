@@ -114,6 +114,30 @@ En resumen: la cobertura medía las piezas, no el ensamblaje. Un defecto que sol
 - **Las validaciones de captura siguen en línea dentro de `Captura.tsx`.** `validateMovimiento` (SPEC-05) reusa las primitivas del dominio y repite los mensajes. Cuando se extraigan a un módulo compartido, hay que apuntar los dos sitios ahí. Ver T-026.
 - **`useLiveQuery` nunca rellena `error`.** `dexie-react-hooks` relanza los errores durante el render para que los capture un `ErrorBoundary`, así que el campo `error` que devuelve el hook siempre es `null`. El estado "Error: toast neutral" de SPEC-05 no se puede alimentar desde ahí tal como está.
 
+## SPEC-06 — Exportaciones (16 sep 2026)
+
+| ID | Decisión | Motivo |
+|---|---|---|
+| T-039 | ExcelJS 4.4 y @react-pdf/renderer 4.9 se cargan **sólo** con `import()` desde `ExportarExcelDialog` y `PlanPdfSection`; los servicios `services/export/*` los importan de forma estática | Criterio 6. Rollup separa `transactionsXlsx-*.js` (940 kB) y `budgetPdf-*.js` (1.25 MB) del chunk inicial, que pasó de 419.33 kB a 424.37 kB (+5 kB de UI). Verificado buscando `exceljs`, `jszip`, `react-pdf`, `PDFDocument`, `fontkit` y `Helvetica` en el chunk inicial: 0 coincidencias. |
+| T-040 | `vite.config.ts` añade `optimizeDeps.include: ['exceljs', '@react-pdf/renderer']` | Como sólo se importan dinámicamente, Vite no los descubre al arrancar el servidor de desarrollo; la primera exportación disparaba una re-optimización y **una recarga de página a mitad de la descarga**. Los E2E fallaban en Chromium con varios workers. No afecta al build de producción ni a los chunks. |
+| T-041 | Las fechas del Excel se construyen en UTC (`Date.UTC(y, m-1, d)`) | ExcelJS calcula el número de serie desde el instante UTC. Con fechas locales, en husos negativos el serie llevaba fracción (hora) y en el límite podía caer al día anterior. Así el serie es entero: `46266` = 01/09/2026. |
+| T-042 | Metadatos del libro: `title` "TRAZIA — Transacciones", `creator` y `lastModifiedBy` = "TRAZIA" | ExcelJS escribe `Unknown` como creador si se deja vacío. El nombre de la app no es un dato personal; se comprobó en `docProps/core.xml`. |
+| T-043 | Sin movimientos en el alcance, el servicio escribe `0` en la fila Total en lugar de `=SUM()` | `SUM(D2:D1)` es un rango invertido y `SUM(D2:D2)` sería circular. La UI ya deshabilita el botón; es sólo robustez del servicio. |
+| T-044 | La protección contra fórmulas cubre exactamente `=`, `+`, `-`, `@` con apóstrofo literal en el valor | Es lo que pide el SPEC. El apóstrofo viaja como parte del texto (`'=HYPERLINK(...)`, celda tipo `t="s"`), así que Excel y Numbers lo muestran tal cual y nunca lo evalúan. Queda anotado que OWASP también lista tabulador y retorno de carro; no se añadieron para no ampliar el alcance. |
+| T-045 | El PDF se construye desde `buildMonthSummary({ transactions: [] })` con las categorías activas, y `buildBudgetPdfData` sólo lee `budgetCents` | Cumple la regla de arquitectura (el servicio recibe datos del dominio, no toca la DB) y hace imposible que un gasto real entre al documento (T-012). Los totales usan el mismo `resolveBudget` que Configuración (criterio 5). |
+| T-046 | Porcentajes del PDF como enteros con `Math.round`, igual que `ChartDataTable` | Criterio 5: coincidir con Configuración. Pueden no sumar 100 exactamente; la fila de total imprime "100%" fijo. |
+| T-047 | La dona del PDF toma las 6 categorías **de mayor presupuesto** y agrupa el resto en "Otras" | `DonaChart` de Configuración toma las 6 primeras en orden configurado (y puede incluir categorías con $0). "6 principales" del SPEC se interpretó como las mayores; los porcentajes por categoría son idénticos en ambos sitios. |
+| T-048 | Colores del PDF fijados en `budgetPdfData.ts`/`budgetPdf.tsx` con los valores hex de `tokens.css` (tema claro) | react-pdf no lee CSS. Fijar los hex garantiza el tema claro aunque el sistema esté en oscuro. Si cambian los tokens hay que actualizar `CHART_COLORS`. |
+| T-049 | `deliverFile` revoca la URL con `setTimeout(…, 1000)` en lugar de hacerlo en el mismo tic | Safari cancela la descarga si la URL del blob se revoca justo después del `click()`. |
+| T-050 | El botón "Exportar a Excel" también aparece en el estado vacío de Visualización | Un mes sin movimientos no impide exportar "Todo el historial". Con el mes seleccionado y sin datos, el diálogo deshabilita la descarga con la nota del SPEC. |
+| T-051 | `configuracion.spec.ts` (SPEC-02) acota el selector de mes al grupo "Presupuesto de" | Usaba `button:has-text("←")` a nivel de página; con el segundo selector de "Plan en PDF" resolvía a dos elementos y fallaba en modo estricto. |
+
+### Anotado, sin corregir
+
+- Vite avisa de chunks mayores de 500 kB en el build (`transactionsXlsx`, `budgetPdf`). Es el comportamiento deseado: son diferidos. Si el aviso molesta, `build.chunkSizeWarningLimit` lo silencia; no se tocó por estar fuera de alcance.
+- ExcelJS entra por su bundle de navegador (`dist/exceljs.min.js`, con polyfills propios); es la razón del peso del chunk. La alternativa `xlsx-js-style` sigue documentada en el SPEC.
+- Las pruebas de `src/__tests__/export/` que generan archivos corren con `// @vitest-environment node` porque el `Blob` de jsdom no implementa `arrayBuffer()`.
+
 ## Pendientes por validar
 
 | ID | Pregunta | Cuándo |

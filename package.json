@@ -16,8 +16,10 @@
     "validate": "npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.9.0",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
+    "exceljs": "^4.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
