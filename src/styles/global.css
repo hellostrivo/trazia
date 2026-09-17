@@ -441,6 +441,16 @@ textarea,
   }
 }
 
+/* Por debajo de 360px las cuatro etiquetas completas suman ~312px a 14px y se
+   tocaban entre sí. A 12px caben (~268px) sin abreviar ni cambiar a iconos; el
+   objetivo táctil se mantiene en 44×44px por el min-height y el ancho del enlace. */
+@media (max-width: 359px) {
+  .bottom-nav .nav-link {
+    padding: var(--space-2) var(--space-1);
+    font-size: var(--font-size-12);
+  }
+}
+
 @media (min-width: 768px) {
   .bottom-nav {
     display: none;
@@ -966,4 +976,31 @@ textarea,
   .button.guardar-gasto {
     transition: none;
   }
+}
+
+/* Datos y respaldo (SPEC-07) */
+.almacenamiento-lista {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.almacenamiento-lista dt {
+  font-size: var(--font-size-14);
+  color: var(--color-ink-600);
+}
+
+.almacenamiento-lista dd {
+  margin: 0;
+}
+
+.privacidad h3 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-16);
+}
+
+.privacidad p {
+  margin: 0;
+  line-height: 1.6;
 }

@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { version } from './package.json';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    // Versión mostrada en Configuración › Acerca de.
+    __APP_VERSION__: JSON.stringify(version),
+  },
   optimizeDeps: {
     // Sólo se cargan con `import()`, así que Vite no los descubre al arrancar.
     // Sin esto, la primera exportación en desarrollo dispara una re-optimización

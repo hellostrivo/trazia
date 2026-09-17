@@ -8,6 +8,8 @@ import { DonaChart } from '../features/configuracion/DonaChart';
 import { BarrasChart } from '../features/configuracion/BarrasChart';
 import { ChartDataTable } from '../features/configuracion/ChartDataTable';
 import { PlanPdfSection } from '../features/configuracion/PlanPdfSection';
+import { RespaldoSection } from '../features/configuracion/RespaldoSection';
+import { PrivacidadSection, PRIVACIDAD_SECTION_ID } from '../features/configuracion/PrivacidadSection';
 import { Button } from '../components/Button';
 import { Dialog } from '../components/Dialog';
 import { Toast } from '../components/Toast';
@@ -327,6 +329,23 @@ export function Configuracion() {
             <ArchivadaSection archivedCategories={archivedCategories} onRestore={handleRestoreCategory} />
           </section>
         )}
+
+        {/* Datos y respaldo (SPEC-07) */}
+        <RespaldoSection />
+
+        {/* Privacidad (SPEC-07) */}
+        <PrivacidadSection />
+
+        {/* Acerca de (SPEC-02): versión y enlace a Privacidad */}
+        <section className="card" style={{ padding: '1.5rem' }} aria-labelledby="acerca-title">
+          <h2 id="acerca-title" style={{ marginBottom: '0.5rem' }}>
+            Acerca de
+          </h2>
+          <p style={{ margin: 0 }}>TRAZIA, versión {__APP_VERSION__}.</p>
+          <p className="muted" style={{ marginBottom: 0 }}>
+            <a href={`#${PRIVACIDAD_SECTION_ID}`}>Cómo se protegen tus datos (Privacidad)</a>
+          </p>
+        </section>
       </div>
 
       {/* Formulario */}

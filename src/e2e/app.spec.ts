@@ -182,6 +182,47 @@ async function expectNoHorizontalOverflow(page: Page, label: string) {
 test.describe('Sin scroll horizontal en 320 px (SPEC-00, criterio 3)', () => {
   test.use({ viewport: VIEWPORT_320 });
 
+  test('la barra inferior muestra las cuatro etiquetas completas, sin solaparse y con objetivos de 44×44 px', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Captura', level: 1 })).toBeVisible();
+
+    const links = await page.evaluate(() =>
+      [...document.querySelectorAll('.bottom-nav .nav-link')].map((link) => {
+        const box = link.getBoundingClientRect();
+        const range = document.createRange();
+        range.selectNodeContents(link);
+        const text = range.getBoundingClientRect();
+        return {
+          label: link.textContent?.trim() ?? '',
+          box: { left: box.left, right: box.right, width: box.width, height: box.height },
+          text: { left: text.left, right: text.right },
+        };
+      }),
+    );
+
+    // Nombres completos: ni abreviaturas ni iconos (decisión de la persona usuaria).
+    expect(links.map((link) => link.label)).toEqual(['Captura', 'Visualización', 'Movimientos', 'Configuración']);
+
+    for (const link of links) {
+      const detail = `${link.label}: caja ${Math.round(link.box.left)}..${Math.round(link.box.right)} (${Math.round(link.box.width)}×${Math.round(link.box.height)}), texto ${Math.round(link.text.left)}..${Math.round(link.text.right)}`;
+      // Objetivo táctil mínimo de 44×44 px (SPEC-00).
+      expect(link.box.width, detail).toBeGreaterThanOrEqual(44);
+      expect(link.box.height, detail).toBeGreaterThanOrEqual(44);
+      // El texto vive dentro de su propio enlace (tolerancia de 1 px por redondeo subpíxel).
+      expect(link.text.left, detail).toBeGreaterThanOrEqual(link.box.left - 1);
+      expect(link.text.right, detail).toBeLessThanOrEqual(link.box.right + 1);
+      expect(link.box.right, detail).toBeLessThanOrEqual(VIEWPORT_320.width);
+    }
+
+    // Y los textos de enlaces vecinos no se tocan.
+    for (let index = 1; index < links.length; index += 1) {
+      const previous = links[index - 1];
+      const current = links[index];
+      if (!previous || !current) continue;
+      expect(current.text.left, `${previous.label} → ${current.label}`).toBeGreaterThan(previous.text.right);
+    }
+  });
+
   for (const route of ROUTES) {
     test(`${route.path} sin datos`, async ({ page }) => {
       await page.goto(route.path);
