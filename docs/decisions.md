@@ -158,7 +158,7 @@ Fuera de este bloque, por instrucción de la persona usuaria: recordatorio de re
 | T-060 | `bulkAdd` en lugar de `bulkPut` al restaurar | Un ID repetido que se colara fallaría en vez de sobrescribir en silencio; con `clear` previo, `put` no aporta nada. |
 | T-061 | Integridad referencial e IDs únicos en `backupDataSchema.superRefine`; además se rechaza un respaldo con dos versiones de presupuesto para la misma categoría y mes | Ese par es índice único en Dexie: si pasara la validación, fallaría dentro de la transacción con un error genérico en lugar del mensaje "datos incompletos o dañados". Los registros usan `categorySchema`, `budgetVersionSchema`, `transactionSchema` y `appSettingsSchema.omit({ key })` del dominio, sin redefinir. |
 | T-062 | Clasificación en dos pasos: `backupEnvelopeSchema` (`app === 'trazia'`, `formatVersion` y `schemaVersion` enteros positivos) decide "no es de TRAZIA" vs "versión más nueva" **antes** de mirar `data`; `backupFileSchema` decide "datos inválidos" | Un archivo de una versión futura puede traer campos que hoy no validan; si se validara todo de golpe se le diría "dañado" en lugar de "actualiza la app". `formatVersion` o `schemaVersion` mayores que 1 → "versión más nueva". |
-| T-063 | Al restaurar, `seededAt` y `lastBackupAt` vienen del archivo y `persistenceRequested` conserva el valor del dispositivo | `persistenceRequested` describe a este navegador, no a los datos. Con `seededAt` del archivo, `ensureSeedCategories` no vuelve a sembrar sobre datos restaurados (además el conteo de categorías > 0 ya lo impide). La comparación profunda de ida y vuelta incluye `settings`. |
+| T-063 ✅ | Al restaurar, `seededAt` y `lastBackupAt` vienen del archivo y `persistenceRequested` conserva el valor del dispositivo. **Aprobada por la persona usuaria (16 sep 2026).** | `persistenceRequested` describe a este navegador, no a los datos. Con `seededAt` del archivo, `ensureSeedCategories` no vuelve a sembrar sobre datos restaurados (además el conteo de categorías > 0 ya lo impide). La comparación profunda de ida y vuelta incluye `settings`. |
 | T-064 | `lastBackupAt` se actualiza sólo **después** de que `deliverFile` resuelva (`markBackupCompleted`), también desde "Descargar respaldo actual primero" | Si la entrega falla no se registra un respaldo que no existe. Probado en `RespaldoSection.test.tsx`. |
 | T-065 | El aviso "El respaldo no está cifrado. Guárdalo en un lugar seguro." es texto fijo sobre el botón, no un diálogo previo | Es un aviso, no una decisión; un diálogo añadiría un toque a cada respaldo y el texto queda visible siempre. |
 | T-066 | Nuevo `isStoragePersisted()` en `storage.ts` (`navigator.storage.persisted()`); `getPersistenceStatus()` no se toca | `getPersistenceStatus` sólo informa si la API existe (nunca devuelve `'denied'` ni consulta `persisted()`), y "Protegido contra borrado automático" necesita el estado real. Sin API o sin concesión se muestra el aviso de SPEC-07. |
@@ -168,11 +168,30 @@ Fuera de este bloque, por instrucción de la persona usuaria: recordatorio de re
 | T-070 | Privacidad es JSX estático en el bundle, sin `fetch` ni Markdown externo | Criterio 6. `respaldo.spec.ts` navega a Configuración con `context.setOffline(true)` y comprueba que no sale ninguna petición. |
 | T-071 | Los E2E de restauración usan el archivo real descargado (`download.path()` → `setInputFiles`) y comparan las tres tablas de datos leídas de IndexedDB antes y después | Criterio 1 con archivo real y no con un objeto en memoria. "Vaciar" se hace directo en IndexedDB porque el borrado total es del bloque B. |
 
-### Hallazgo: `requestPersistence` no se llama desde ningún lado
+### Hallazgo corregido: `requestPersistence` no se llamaba desde ningún lado
 
-- `requestPersistence()` (SPEC-01) existe en `src/data/storage.ts` pero **nadie la invoca**: ni tras el primer movimiento (`Captura.tsx`), ni en el arranque (`main.tsx`). `settings.persistenceRequested` nunca pasa a `true`. El criterio 5 de SPEC-07 ("se solicita la persistencia tras el primer movimiento") no se cumple hoy.
-- `getPersistenceStatus()` nunca devuelve `'denied'`: sólo distingue si `navigator.storage.persist` existe.
-- No se corrigió en este bloque (instrucción expresa de consultar antes). Pendiente de decisión: dónde llamarla (tras guardar el primer movimiento, según el SPEC) y si `persistenceRequested` debe registrar el intento o el resultado.
+- `requestPersistence()` (SPEC-01) existía en `src/data/storage.ts` sin que nadie la invocara: ni tras el primer movimiento ni en el arranque. `settings.persistenceRequested` nunca pasaba a `true` y el criterio 5 de SPEC-07 no se cumplía. `getPersistenceStatus()` sigue sin devolver `'denied'` (sólo distingue si la API existe); el estado real lo da `isStoragePersisted()` (T-066).
+- Corregido por instrucción de la persona usuaria (16 sep 2026), ver T-072.
+
+| ID | Decisión | Motivo |
+|---|---|---|
+| T-072 ✅ | `requestPersistenceOnce()` en `storage.ts`: en una transacción sobre `settings` marca `persistenceRequested = true` si aún era `false` y, sólo en ese caso, llama a `requestPersistence()`. `Captura.handleSave` la invoca justo después de `upsertTransaction`, sin esperar su resultado y sin que un fallo afecte al guardado | Decisión de la persona usuaria: se pide tras guardar el primer movimiento, una sola vez, y la bandera registra el **intento**, no el resultado (así no se vuelve a pedir aunque el navegador la niegue). El resultado real se consulta con `navigator.storage.persisted()`. La bandera se escribe dentro de la transacción antes de llamar a la API, de modo que dos guardados concurrentes no la piden dos veces. Pruebas: `src/__tests__/captura/persistencia.test.tsx` renderiza la página real, guarda tres movimientos y comprueba que `navigator.storage.persist` se llama exactamente una vez (y ninguna si la bandera ya era `true`); `captura.spec.ts` lee la bandera en IndexedDB tras el primer guardado en el navegador. |
+
+### Patrón repetido: función escrita, probada en aislamiento y nunca invocada
+
+Ha ocurrido dos veces en este proyecto:
+
+1. `ensureSeedCategories` (SPEC-01): existía, tenía pruebas de integración (semilla una sola vez, concurrencia) y nadie la llamaba desde `main.tsx`. Una instalación nueva abría Captura sin categorías. Se detectó en el bloque de estabilización, no en `validate`.
+2. `requestPersistence` (SPEC-01): existía, `storage.ts` era correcto, y nadie la llamaba desde Captura ni desde el arranque. Se detectó al implementar SPEC-07, cuatro SPEC después.
+
+Por qué las pruebas no lo ven: probar la función demuestra que *funciona*, no que *se usa*. Cobertura y pruebas unitarias miden las piezas; el defecto está en el ensamblaje, igual que en la auditoría de cobertura del bloque de estabilización.
+
+Qué sí lo detecta: una prueba que parta del **punto de arranque real** y verifique el efecto observable de la función, no la función en sí:
+
+- para la semilla: `smoke.spec.ts` abre la app en una instalación nueva y exige las 8 categorías en Captura;
+- para la persistencia: `persistencia.test.tsx` renderiza la página `Captura` y cuenta las llamadas a `navigator.storage.persist`; `captura.spec.ts` lee `persistenceRequested` en la base real tras guardar.
+
+Regla para los SPEC siguientes: cuando un SPEC diga "X se ejecuta cuando Y" (arranque, primer movimiento, cierre de sesión…), la prueba obligatoria es la que provoca Y desde la UI o desde `main.tsx` y observa X; la prueba de X en aislamiento es complementaria, nunca suficiente. Una función exportada de `src/data` o `src/domain` sin ningún importador fuera de `__tests__` es una señal de alarma que conviene revisar al cerrar cada bloque (`grep -rn "nombre(" src | grep -v __tests__`).
 
 ### Anotado, sin corregir
 

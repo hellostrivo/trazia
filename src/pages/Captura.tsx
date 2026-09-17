@@ -3,6 +3,7 @@ import { today, monthKeyOf } from '../domain/dates';
 import { useLiveQuery } from '../data/hooks/useLiveQuery';
 import { listCategories } from '../data/repositories/categories';
 import { listTransactionsByMonth, upsertTransaction, deleteTransaction } from '../data/repositories/transactions';
+import { requestPersistenceOnce } from '../data/storage';
 import { parseMoneyInput, formatMXN } from '../domain/money';
 import { Button } from '../components/Button';
 import { Toast } from '../components/Toast';
@@ -86,6 +87,11 @@ export default function Captura() {
     try {
       const amountCents = parseMoneyInput(amount);
       const record = await upsertTransaction({ concept: concept.trim(), amountCents, categoryId: categoryId!, date });
+      // SPEC-07, criterio 5: la persistencia se pide tras el primer movimiento
+      // guardado. Va aparte del guardado: si falla, el movimiento ya está a salvo.
+      void requestPersistenceOnce().catch((error) => {
+        console.error('No se pudo solicitar la persistencia', error);
+      });
       setToast({ open: true, message: `Guardado: ${formatMXN(record.amountCents)} en ${activeCategories.find((c) => c.id === record.categoryId)?.name ?? ''}`, undoId: record.id });
 
       // Clear fields except date

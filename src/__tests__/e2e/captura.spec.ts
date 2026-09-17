@@ -22,6 +22,30 @@ test.describe('Captura', () => {
     // Toast de guardado
     await expect(page.getByText(/Guardado:/)).toBeVisible();
 
+    // SPEC-07, criterio 5: el primer movimiento guardado deja registrado el
+    // intento de persistencia (se comprueba en la base real, no en la función).
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            new Promise<boolean | null>((resolve, reject) => {
+              const request = indexedDB.open('trazia');
+              request.onerror = () => reject(request.error);
+              request.onsuccess = () => {
+                const database = request.result;
+                const get = database.transaction('settings', 'readonly').objectStore('settings').get('app');
+                get.onsuccess = () => {
+                  database.close();
+                  const row = get.result as { persistenceRequested?: boolean } | undefined;
+                  resolve(row?.persistenceRequested ?? null);
+                };
+                get.onerror = () => reject(get.error);
+              };
+            }),
+        ),
+      )
+      .toBe(true);
+
     // Hacer click en Deshacer
     await page.getByRole('button', { name: 'Deshacer' }).click();
 

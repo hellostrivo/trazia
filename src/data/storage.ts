@@ -1,3 +1,6 @@
+import { db } from './db';
+import { makeDefaultSettings } from '../domain/seed';
+
 export async function requestPersistence(): Promise<boolean> {
   if (typeof navigator === 'undefined' || !('storage' in navigator)) {
     return false;
@@ -42,5 +45,24 @@ export async function isStoragePersisted(): Promise<boolean> {
     return await persisted();
   } catch {
     return false;
+  }
+}
+
+/**
+ * Pide la persistencia una sola vez por instalación (SPEC-01; SPEC-07,
+ * criterio 5). `settings.persistenceRequested` registra el **intento**, no el
+ * resultado, para no volver a pedirla; el estado real se consulta con
+ * `isStoragePersisted()`. Se llama tras guardar el primer movimiento.
+ */
+export async function requestPersistenceOnce(): Promise<void> {
+  const firstAttempt = await db.transaction('rw', db.settings, async () => {
+    const current = (await db.settings.get('app')) ?? makeDefaultSettings();
+    if (current.persistenceRequested) return false;
+    await db.settings.put({ ...current, key: 'app', persistenceRequested: true });
+    return true;
+  });
+
+  if (firstAttempt) {
+    await requestPersistence();
   }
 }
