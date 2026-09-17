@@ -9,6 +9,8 @@
   --color-accent-soft: #e3ece6;
   --color-attention: #94662c;
   --color-focus: #2f5d8a;
+  --color-selected: #2f5d8a;
+  --color-selected-ink: #ffffff;
   --color-graph-slate: #3e5c76;
   --color-graph-sage: #6b9080;
   --color-graph-ochre: #c08a3e;
@@ -56,5 +58,7 @@
     --color-accent-soft: #243330;
     --color-attention: #d6a15e;
     --color-focus: #9cc0ff;
+    --color-selected: #9cc0ff;
+    --color-selected-ink: #12181f;
   }
 }

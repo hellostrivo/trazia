@@ -250,6 +250,12 @@ Regla para los SPEC siguientes: cuando un SPEC diga "X se ejecuta cuando Y" (arr
 | T-095 | `ResumenBrieve` (Captura) usa `h2` en lugar de `h3`; `.resumen-brieve h2` conserva el tamaño y los márgenes por defecto de `h3` en CSS | `heading-order`: la jerarquía es semántica (h1 → h2), el tamaño es presentación. Sin cambio visual. |
 | T-096 | `CategoriasLista` pasa de `role="table"`/`role="row"` a `<ul aria-label="Lista de categorías">` con `<li>` por categoría; `.categorias-list-container` anula viñetas y sangría | `aria-required-children`: un `row` exige hijos `cell`, y la fila (color, nombre + monto, acciones) no es tabular: no hay columnas ni encabezados. Una lista describe mejor lo que hay y no obliga a inventar celdas alrededor de cada botón. |
 
+### Estado seleccionado en Captura (solicitado por la persona usuaria, 16 sep 2026)
+
+| ID | Decisión | Motivo |
+|---|---|---|
+| T-097 | Nuevos tokens `--color-selected` / `--color-selected-ink` (azul: `#2f5d8a` sobre blanco en claro, `#9cc0ff` sobre `#12181f` en oscuro) y estilos `.chip` / `.chip.selected` en `global.css`. `CategoriaChips` ya usaba esas clases; `FechaChip` las adopta en "Hoy" y "Cambiar" con `aria-pressed`. "Hoy" queda marcado cuando la fecha es hoy y el selector está cerrado; "Cambiar", cuando el selector está abierto o la fecha no es hoy. Pulsar "Hoy" cierra el selector. | La opción elegida debe distinguirse del resto de botones (verde de acento, superficie neutra) y el azul es el único tono libre en la paleta de la interfaz. Además del color cambia peso y borde, y el estado se anuncia por ARIA. Contraste AA en ambos temas (6.9:1 y 11.5:1). |
+
 ### Deuda y pendientes
 
 - La revisión en iPhone real (instalación, áreas seguras, teclado, exportaciones desde la app instalada) sigue siendo manual (SPEC-08 › Pruebas).

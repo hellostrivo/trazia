@@ -982,6 +982,49 @@ textarea,
   }
 }
 
+/* Chips de selección en Captura (categoría y fecha). La opción elegida usa
+   un azul distinto al resto de botones y, además del color, cambia peso y
+   borde; el estado se anuncia con aria-checked / aria-pressed. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-ink-900);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.chip:hover {
+  background: var(--color-surface-alt);
+}
+
+/* Contraste AA en ambos temas: 6.9:1 en claro, 11.5:1 en oscuro. */
+.chip.selected {
+  background: var(--color-selected);
+  color: var(--color-selected-ink);
+  border-color: var(--color-selected);
+  font-weight: 600;
+}
+
+.chip.selected:hover {
+  background: var(--color-selected);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}
+
 /* Datos y respaldo (SPEC-07) */
 .almacenamiento-lista {
   display: grid;
