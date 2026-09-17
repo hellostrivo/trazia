@@ -2,13 +2,7 @@ import { useId, useRef, useState, type ChangeEvent } from 'react';
 import { Button } from '../../components/Button';
 import { Dialog } from '../../components/Dialog';
 import { parseLocalDate } from '../../domain/dates';
-import { deliverFile } from '../../services/files/deliverFile';
-import {
-  BACKUP_MIME,
-  backupFilename,
-  exportBackup,
-  markBackupCompleted,
-} from '../../services/backup/exportBackup';
+import { downloadCurrentBackup } from '../../services/backup/exportBackup';
 import { BackupImportError, type BackupFile } from '../../services/backup/backupSchema';
 import {
   importBackup,
@@ -62,14 +56,6 @@ type RestoreState =
       importing: boolean;
     }
   | { step: 'done' };
-
-/** Descarga el respaldo actual y registra `lastBackupAt` cuando se entregó. */
-async function downloadCurrentBackup(): Promise<void> {
-  const now = new Date();
-  const blob = await exportBackup(now);
-  await deliverFile(blob, backupFilename(now), BACKUP_MIME);
-  await markBackupCompleted(now);
-}
 
 /**
  * Configuración › Datos y respaldo (SPEC-07, puntos 1 a 3).

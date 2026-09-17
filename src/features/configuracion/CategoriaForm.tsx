@@ -157,10 +157,17 @@ export function CategoriaForm({
   };
 
   return (
-    <Dialog open={open} title={mode === 'create' ? 'Agregar categoría' : 'Editar categoría'} onClose={onClose}>
+    <Dialog
+      open={open}
+      title={mode === 'create' ? 'Agregar categoría' : 'Editar categoría'}
+      onClose={onClose}
+    >
       <div className="dialog-body stack">
         <div>
-          <label htmlFor="categoria-name" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+          <label
+            htmlFor="categoria-name"
+            style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}
+          >
             Nombre *
           </label>
           <input
@@ -174,14 +181,20 @@ export function CategoriaForm({
             aria-describedby={nameError || error ? 'error-message' : undefined}
           />
           {(nameError || error) && (
-            <small id="error-message" style={{ color: 'var(--color-attention)', display: 'block', marginTop: '0.5rem' }}>
+            <small
+              id="error-message"
+              style={{ color: 'var(--color-attention)', display: 'block', marginTop: '0.5rem' }}
+            >
               {nameError || error}
             </small>
           )}
         </div>
 
         <div>
-          <label htmlFor="categoria-color" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+          <label
+            htmlFor="categoria-color"
+            style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}
+          >
             Color
           </label>
           <select
@@ -199,7 +212,10 @@ export function CategoriaForm({
         </div>
 
         <div>
-          <label htmlFor="categoria-budget" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+          <label
+            htmlFor="categoria-budget"
+            style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}
+          >
             Presupuesto (opcional)
           </label>
           <input
@@ -212,16 +228,25 @@ export function CategoriaForm({
             aria-describedby={budgetError ? 'budget-error' : undefined}
           />
           {budgetError && (
-            <small id="budget-error" style={{ color: 'var(--color-attention)', display: 'block', marginTop: '0.5rem' }}>
+            <small
+              id="budget-error"
+              style={{ color: 'var(--color-attention)', display: 'block', marginTop: '0.5rem' }}
+            >
               {budgetError}
             </small>
           )}
         </div>
 
         <div className="form-note">
-          <p>Aplica desde <strong>{formatMonthLabel(monthKey)}</strong> en adelante.</p>
+          <p>
+            Aplica desde <strong>{formatMonthLabel(monthKey)}</strong> en adelante.
+          </p>
           {nextVersionMonth && nextVersionAmount !== undefined && (
-            <p>Hasta <strong>{formatMonthLabel(addMonths(monthKey, -1))}</strong>; a partir de <strong>{formatMonthLabel(nextVersionMonth)}</strong> aplica <strong>${formatMoneyInput(nextVersionAmount)}</strong>.</p>
+            <p>
+              Hasta <strong>{formatMonthLabel(addMonths(monthKey, -1))}</strong>; a partir de{' '}
+              <strong>{formatMonthLabel(nextVersionMonth)}</strong> aplica{' '}
+              <strong>${formatMoneyInput(nextVersionAmount)}</strong>.
+            </p>
           )}
         </div>
 

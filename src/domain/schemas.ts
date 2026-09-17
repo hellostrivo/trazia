@@ -60,6 +60,8 @@ export const appSettingsSchema = z.object({
   seededAt: isoDateTimeSchema.nullable(),
   lastBackupAt: isoDateTimeSchema.nullable(),
   persistenceRequested: z.boolean(),
+  // Con valor por omisión: las filas y los respaldos anteriores a SPEC-07 B no lo traen.
+  backupReminderDismissedAt: isoDateTimeSchema.nullable().default(null),
 });
 
 export const monthSummaryRowSchema = z.object({

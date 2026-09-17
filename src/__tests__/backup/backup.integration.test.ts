@@ -99,6 +99,7 @@ describe('respaldo: exportación', () => {
     expect(data.transactions).toHaveLength(3);
     // `settings` va sin la clave fija `key`.
     expect(Object.keys(data.settings as object).sort()).toEqual([
+      'backupReminderDismissedAt',
       'lastBackupAt',
       'persistenceRequested',
       'seededAt',
@@ -111,6 +112,7 @@ describe('respaldo: exportación', () => {
       seededAt: null,
       lastBackupAt: null,
       persistenceRequested: false,
+      backupReminderDismissedAt: null,
     });
   });
 
@@ -179,18 +181,23 @@ describe('respaldo: importación', () => {
         seededAt: backup.data.settings.seededAt,
         lastBackupAt: null,
         persistenceRequested: false,
+        backupReminderDismissedAt: null,
       },
     ]);
   });
 
   it('conserva persistenceRequested del dispositivo y toma seededAt/lastBackupAt del archivo', async () => {
     await ensureSeedCategories();
-    await db.settings.update('app', { persistenceRequested: true });
+    await db.settings.update('app', {
+      persistenceRequested: true,
+      backupReminderDismissedAt: null,
+    });
     const backup = makeValidBackup();
     backup.data.settings = {
       seededAt: '2025-01-01T00:00:00.000Z',
       lastBackupAt: '2026-09-01T00:00:00.000Z',
       persistenceRequested: false,
+      backupReminderDismissedAt: null,
     };
 
     await importBackup(backup);
@@ -200,6 +207,7 @@ describe('respaldo: importación', () => {
       seededAt: '2025-01-01T00:00:00.000Z',
       lastBackupAt: '2026-09-01T00:00:00.000Z',
       persistenceRequested: true,
+      backupReminderDismissedAt: null,
     });
   });
 

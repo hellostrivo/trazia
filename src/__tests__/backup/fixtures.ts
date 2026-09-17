@@ -77,7 +77,12 @@ export function makeValidBackup(): BackupFile {
           updatedAt: ISO,
         },
       ],
-      settings: { seededAt: ISO, lastBackupAt: null, persistenceRequested: false },
+      settings: {
+        seededAt: ISO,
+        lastBackupAt: null,
+        persistenceRequested: false,
+        backupReminderDismissedAt: null,
+      },
     },
   };
 }

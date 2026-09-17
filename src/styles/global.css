@@ -1004,3 +1004,24 @@ textarea,
   margin: 0;
   line-height: 1.6;
 }
+
+/* Punto del recordatorio de respaldo en la pestaña Configuración (SPEC-07).
+   Absoluto para no alterar la caja del enlace (columna en la barra inferior). */
+.nav-link {
+  position: relative;
+}
+
+.nav-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-attention);
+}
+
+.recordatorio-respaldo p {
+  color: var(--color-ink-900);
+  font-size: var(--font-size-16);
+}

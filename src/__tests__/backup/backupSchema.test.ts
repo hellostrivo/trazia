@@ -37,6 +37,14 @@ describe('backupSchema (SPEC-07)', () => {
       expect(parseBackupObject(backup).data.categories).toEqual([]);
     });
 
+    it('acepta un respaldo del bloque A (sin backupReminderDismissedAt) y rellena el campo', () => {
+      const backup = clone(makeValidBackup()) as unknown as {
+        data: { settings: Record<string, unknown> };
+      };
+      delete backup.data.settings.backupReminderDismissedAt;
+      expect(parseBackupObject(backup).data.settings.backupReminderDismissedAt).toBeNull();
+    });
+
     it('acepta el texto JSON del archivo', () => {
       const backup = makeValidBackup();
       expect(parseBackupText(JSON.stringify(backup))).toEqual(backup);

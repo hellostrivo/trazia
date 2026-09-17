@@ -47,6 +47,7 @@ export const settingsSeedSchema = z.object({
   seededAt: z.string().nullable(),
   lastBackupAt: z.string().nullable(),
   persistenceRequested: z.boolean(),
+  backupReminderDismissedAt: z.string().nullable().default(null),
 });
 
 export function makeDefaultSettings(): AppSettings {
@@ -55,5 +56,6 @@ export function makeDefaultSettings(): AppSettings {
     seededAt: null,
     lastBackupAt: null,
     persistenceRequested: false,
+    backupReminderDismissedAt: null,
   };
 }

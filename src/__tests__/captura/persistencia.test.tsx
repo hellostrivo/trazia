@@ -89,6 +89,7 @@ describe('Captura · solicitud de persistencia (SPEC-07, criterio 5)', () => {
       seededAt: null,
       lastBackupAt: null,
       persistenceRequested: true,
+      backupReminderDismissedAt: null,
     });
     await renderCaptura();
 
@@ -150,6 +151,7 @@ describe('requestPersistenceOnce', () => {
       seededAt: '2026-01-01T00:00:00.000Z',
       lastBackupAt: '2026-09-01T00:00:00.000Z',
       persistenceRequested: false,
+      backupReminderDismissedAt: null,
     });
     await requestPersistenceOnce();
     expect(await db.settings.get('app')).toEqual({
@@ -157,6 +159,7 @@ describe('requestPersistenceOnce', () => {
       seededAt: '2026-01-01T00:00:00.000Z',
       lastBackupAt: '2026-09-01T00:00:00.000Z',
       persistenceRequested: true,
+      backupReminderDismissedAt: null,
     });
   });
 });

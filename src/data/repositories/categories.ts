@@ -103,6 +103,7 @@ export async function ensureSeedCategories(): Promise<void> {
       seededAt: now,
       lastBackupAt: null,
       persistenceRequested: false,
+      backupReminderDismissedAt: null,
     });
   });
 }

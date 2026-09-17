@@ -103,31 +103,6 @@ async function seedLocalDatabase(page: Page, payload: SeedPayload) {
   }, payload);
 }
 
-/** Vacía las tres tablas de datos (equivale al "borrar todo" del bloque B). */
-async function wipeLocalDatabase(page: Page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve, reject) => {
-      const request = indexedDB.open('trazia');
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        const database = request.result;
-        const tx = database.transaction(
-          ['categories', 'budgetVersions', 'transactions'],
-          'readwrite',
-        );
-        tx.objectStore('categories').clear();
-        tx.objectStore('budgetVersions').clear();
-        tx.objectStore('transactions').clear();
-        tx.oncomplete = () => {
-          database.close();
-          resolve(null);
-        };
-        tx.onerror = () => reject(tx.error);
-      };
-    });
-  });
-}
-
 /** Lee todas las filas de una tabla, ordenadas por id, para comparar de forma profunda. */
 async function readTable(page: Page, table: string): Promise<unknown[]> {
   return page.evaluate(async (name: string) => {
@@ -150,6 +125,42 @@ async function readTable(page: Page, table: string): Promise<unknown[]> {
   }, table);
 }
 
+/** Flujo real del borrado total: botón → diálogo → Continuar → escribir BORRAR → Borrar todo. */
+async function borrarTodoPorLaUI(page: Page) {
+  const borrar = page.getByRole('region', { name: 'Borrar todos los datos' });
+  await borrar.getByRole('button', { name: 'Borrar todos los datos' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Borrar todos los datos' });
+  await expect(dialog).toContainText('Esta acción no se puede deshacer.');
+  await dialog.getByRole('button', { name: 'Continuar' }).click();
+  const input = dialog.getByLabel('Escribe BORRAR para confirmar');
+  const confirm = dialog.getByRole('button', { name: 'Borrar todo' });
+  await expect(confirm).toBeDisabled();
+  await input.fill('BORRAR');
+  await expect(confirm).toBeEnabled();
+  await confirm.click();
+  await expect(dialog).not.toBeVisible();
+}
+
+/** Escribe la fila de settings tal cual (para simular fechas de respaldo o de descarte). */
+async function putSettings(page: Page, row: Record<string, unknown>) {
+  await page.evaluate(async (data: Record<string, unknown>) => {
+    await new Promise((resolve, reject) => {
+      const request = indexedDB.open('trazia');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const tx = database.transaction('settings', 'readwrite');
+        tx.objectStore('settings').put({ key: 'app', ...data });
+        tx.oncomplete = () => {
+          database.close();
+          resolve(null);
+        };
+        tx.onerror = () => reject(tx.error);
+      };
+    });
+  }, row);
+}
+
 function watchExternalRequests(page: Page): string[] {
   const external: string[] = [];
   page.on('request', (request) => {
@@ -166,7 +177,7 @@ async function openConfiguracion(page: Page) {
   await expect(page.getByRole('heading', { name: 'Configuración', level: 1 })).toBeVisible();
 }
 
-test.describe('Respaldo y restauración (SPEC-07, bloque A)', () => {
+test.describe('Respaldo y restauración (SPEC-07)', () => {
   test('respaldar → vaciar → restaurar deja los datos idénticos', async ({ page }) => {
     await openConfiguracion(page);
     await seedLocalDatabase(page, seedPayload);
@@ -218,6 +229,7 @@ test.describe('Respaldo y restauración (SPEC-07, bloque A)', () => {
     expect(file.data.categories).toHaveLength(10);
     expect(file.data.transactions.map((t) => t.id).sort()).toEqual(['bk-tx-1', 'bk-tx-2']);
     expect(Object.keys(file.data.settings).sort()).toEqual([
+      'backupReminderDismissedAt',
       'lastBackupAt',
       'persistenceRequested',
       'seededAt',
@@ -225,18 +237,23 @@ test.describe('Respaldo y restauración (SPEC-07, bloque A)', () => {
 
     await expect(section).toContainText('Respaldo descargado.');
     await expect(section).not.toContainText('Nunca');
+    const settingsBefore = (await readTable(page, 'settings'))[0] as { seededAt: string };
 
-    // 2. Vaciar (como el borrado total del bloque B).
-    await wipeLocalDatabase(page);
+    // 2. Borrar todo por la UI (SPEC-07, punto 5): diálogo → escribir BORRAR → borrar.
+    await borrarTodoPorLaUI(page);
+    const borrar = page.getByRole('region', { name: 'Borrar todos los datos' });
+    await expect(borrar).toContainText('Datos borrados. La app quedó como recién instalada.');
+    // Recién instalada: sólo las 8 categorías genéricas, sin movimientos.
+    await expect(section).toContainText('8 categorías y 0 movimientos');
     await page.reload();
-    await expect(section).toContainText('0 categorías y 0 movimientos');
+    await expect(section).toContainText('8 categorías y 0 movimientos');
 
     // 3. Restaurar desde el archivo real: validar → vista previa → confirmar → reemplazar.
     await section.getByLabel('Archivo de respaldo').setInputFiles(path!);
     const preview = section.getByTestId('respaldo-vista-previa');
     await expect(preview).toHaveText(/^Contiene 10 categorías y 2 movimientos \(del .+ al .+\)/);
     // Nada cambia hasta confirmar.
-    await expect(section).toContainText('0 categorías y 0 movimientos');
+    await expect(section).toContainText('8 categorías y 0 movimientos');
 
     await preview.getByRole('button', { name: 'Restaurar' }).click();
     const dialog = page.getByRole('dialog', { name: 'Restaurar respaldo' });
@@ -256,6 +273,10 @@ test.describe('Respaldo y restauración (SPEC-07, bloque A)', () => {
       transactions: await readTable(page, 'transactions'),
     };
     expect(after).toEqual(before);
+    // El borrado reinició seededAt; la restauración lo trae de vuelta del archivo.
+    expect(((await readTable(page, 'settings'))[0] as { seededAt: string }).seededAt).toBe(
+      settingsBefore.seededAt,
+    );
 
     // Los movimientos vuelven a la vista.
     await page.goto(`/movimientos?mes=${monthKey}`);
@@ -405,5 +426,133 @@ test.describe('Respaldo y restauración (SPEC-07, bloque A)', () => {
 
     expect(requests).toEqual([]);
     await context.setOffline(false);
+  });
+
+  test('borrar todo exige BORRAR exacto y deja la app recién instalada (criterio 4)', async ({
+    page,
+  }) => {
+    await openConfiguracion(page);
+    await seedLocalDatabase(page, seedPayload);
+    await page.reload();
+    const section = page.getByRole('region', { name: 'Datos y respaldo' });
+    await expect(section).toContainText('10 categorías y 2 movimientos');
+
+    const borrar = page.getByRole('region', { name: 'Borrar todos los datos' });
+    await borrar.getByRole('button', { name: 'Borrar todos los datos' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Borrar todos los datos' });
+    await expect(
+      dialog.getByRole('button', { name: 'Descargar respaldo actual primero' }),
+    ).toBeVisible();
+    // El primer diálogo no tiene botón de borrado: hace falta el segundo paso.
+    await expect(dialog.getByRole('button', { name: 'Borrar todo' })).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Continuar' }).click();
+
+    const input = dialog.getByLabel('Escribe BORRAR para confirmar');
+    const confirm = dialog.getByRole('button', { name: 'Borrar todo' });
+    for (const wrong of ['', 'borrar', 'BORRA', 'Borrar']) {
+      await input.fill(wrong);
+      await expect(confirm, JSON.stringify(wrong)).toBeDisabled();
+    }
+    await expect(section).toContainText('10 categorías y 2 movimientos');
+
+    await input.fill('BORRAR');
+    await expect(confirm).toBeEnabled();
+    await confirm.click();
+
+    await expect(borrar).toContainText('Datos borrados. La app quedó como recién instalada.');
+    await expect(section).toContainText('8 categorías y 0 movimientos');
+    const categories = (await readTable(page, 'categories')) as Array<{ name: string }>;
+    expect(categories.map((c) => c.name).sort()).toEqual(
+      [
+        'Hogar',
+        'Supermercado',
+        'Transporte',
+        'Salud',
+        'Cuidado personal',
+        'Comidas fuera',
+        'Entretenimiento',
+        'Otros',
+      ].sort(),
+    );
+    expect(await readTable(page, 'transactions')).toEqual([]);
+    expect(await readTable(page, 'budgetVersions')).toEqual([]);
+    const settings = (await readTable(page, 'settings'))[0] as {
+      seededAt: string | null;
+      lastBackupAt: string | null;
+    };
+    expect(settings.seededAt).not.toBeNull();
+    expect(settings.lastBackupAt).toBeNull();
+
+    // Captura vuelve a funcionar con las categorías genéricas.
+    await page.goto('/');
+    await expect(page.getByRole('radio', { name: 'Hogar' })).toBeVisible();
+  });
+
+  test('recordatorio de respaldo: aparece con movimientos, se cierra por 30 días y desaparece al respaldar', async ({
+    page,
+  }) => {
+    await openConfiguracion(page);
+    // Sin movimientos: ni aviso ni punto.
+    const aviso = page.getByRole('complementary', { name: 'Recordatorio de respaldo' });
+    const tab = page.getByRole('link', { name: /^Configuración/ });
+    await expect(aviso).toHaveCount(0);
+    await expect(tab.locator('.nav-dot')).toHaveCount(0);
+
+    // Con movimientos y sin respaldo previo.
+    await seedLocalDatabase(page, seedPayload);
+    await page.reload();
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('Aún no has descargado un respaldo de tus datos.');
+    await expect(aviso).not.toContainText(/cuidado|perder|¡/i);
+    await expect(tab.locator('.nav-dot')).toHaveCount(1);
+    await expect(tab).toHaveAccessibleName('Configuración (respaldo pendiente)');
+
+    // Cerrar por 30 días.
+    await aviso.getByRole('button', { name: 'Cerrar por 30 días' }).click();
+    await expect(aviso).toHaveCount(0);
+    await expect(tab.locator('.nav-dot')).toHaveCount(0);
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Configuración', level: 1 })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Datos y respaldo' })).toBeVisible();
+    await expect(aviso).toHaveCount(0);
+
+    // Respaldo de hace 31 días y descarte de hace 31 días: vuelve a aparecer con el texto de "más de 30 días".
+    const day = 24 * 60 * 60 * 1000;
+    await putSettings(page, {
+      seededAt: isoNow,
+      lastBackupAt: new Date(Date.now() - 31 * day).toISOString(),
+      persistenceRequested: false,
+      backupReminderDismissedAt: new Date(Date.now() - 31 * day).toISOString(),
+    });
+    await page.reload();
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('Han pasado más de 30 días desde tu último respaldo.');
+
+    // Respaldo de hace 29 días: no aparece.
+    await putSettings(page, {
+      seededAt: isoNow,
+      lastBackupAt: new Date(Date.now() - 29 * day).toISOString(),
+      persistenceRequested: false,
+      backupReminderDismissedAt: null,
+    });
+    await page.reload();
+    await expect(page.getByRole('region', { name: 'Datos y respaldo' })).toBeVisible();
+    await expect(aviso).toHaveCount(0);
+
+    // Vuelve a 31 días y se descarga desde el propio aviso: desaparece.
+    await putSettings(page, {
+      seededAt: isoNow,
+      lastBackupAt: new Date(Date.now() - 31 * day).toISOString(),
+      persistenceRequested: false,
+      backupReminderDismissedAt: null,
+    });
+    await page.reload();
+    await expect(aviso).toBeVisible();
+    const downloadPromise = page.waitForEvent('download');
+    await aviso.getByRole('button', { name: 'Descargar respaldo' }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^trazia-respaldo-\d{4}-\d{2}-\d{2}\.json$/);
+    await expect(aviso).toHaveCount(0);
+    await expect(tab.locator('.nav-dot')).toHaveCount(0);
   });
 });

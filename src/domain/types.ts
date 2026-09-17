@@ -51,6 +51,8 @@ export interface AppSettings {
   seededAt: ISODateTime | null;
   lastBackupAt: ISODateTime | null;
   persistenceRequested: boolean;
+  /** Última vez que se cerró el recordatorio de respaldo (SPEC-07, punto 4). */
+  backupReminderDismissedAt: ISODateTime | null;
 }
 
 export interface MonthSummaryRow {

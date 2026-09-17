@@ -65,7 +65,10 @@ export function BarrasChart({ data, totalCents }: BarrasChartProps) {
           );
         })}
       </div>
-      <div className="barras-chart-note" style={{ fontSize: '12px', marginTop: '1rem', color: 'var(--color-ink-600)' }}>
+      <div
+        className="barras-chart-note"
+        style={{ fontSize: '12px', marginTop: '1rem', color: 'var(--color-ink-600)' }}
+      >
         Los porcentajes están redondeados
       </div>
     </figure>

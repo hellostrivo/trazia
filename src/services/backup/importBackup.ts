@@ -79,6 +79,7 @@ export async function importBackup(input: BackupFile): Promise<void> {
         seededAt: data.settings.seededAt,
         lastBackupAt: data.settings.lastBackupAt,
         persistenceRequested: current?.persistenceRequested ?? false,
+        backupReminderDismissedAt: data.settings.backupReminderDismissedAt,
       };
 
       await db.categories.clear();

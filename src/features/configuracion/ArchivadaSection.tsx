@@ -51,10 +51,19 @@ export function ArchivadaSection({ archivedCategories, onRestore }: ArchivadaSec
       </button>
 
       {isOpen && (
-        <div className="archivada-list" id="archivada-list" role="region" aria-label="Categorías archivadas">
+        <div
+          className="archivada-list"
+          id="archivada-list"
+          role="region"
+          aria-label="Categorías archivadas"
+        >
           {archivedCategories.map((category) => (
             <div key={category.id} className="archivada-item">
-              <div className="archivada-color" style={{ backgroundColor: colorMap[category.colorKey] }} aria-hidden="true"></div>
+              <div
+                className="archivada-color"
+                style={{ backgroundColor: colorMap[category.colorKey] }}
+                aria-hidden="true"
+              ></div>
               <span className="archivada-name">{category.name}</span>
               <Button
                 variant="secondary"

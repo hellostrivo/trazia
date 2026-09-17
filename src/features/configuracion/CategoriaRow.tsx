@@ -44,7 +44,11 @@ export function CategoriaRow({
 }: CategoriaRowProps) {
   return (
     <div className="categoria-row" role="row">
-      <div className="categoria-row-color" style={{ backgroundColor: colorMap[colorKey] }} aria-hidden="true"></div>
+      <div
+        className="categoria-row-color"
+        style={{ backgroundColor: colorMap[colorKey] }}
+        aria-hidden="true"
+      ></div>
       <div className="categoria-row-content">
         <span className="categoria-row-name">{name}</span>
         <span className="categoria-row-details">

@@ -8,7 +8,11 @@ interface MonthBudgetSelectorProps {
   label?: string;
 }
 
-export function MonthBudgetSelector({ value, onChange, label = 'Presupuesto de' }: MonthBudgetSelectorProps) {
+export function MonthBudgetSelector({
+  value,
+  onChange,
+  label = 'Presupuesto de',
+}: MonthBudgetSelectorProps) {
   const handlePrev = () => onChange(addMonths(value, -1));
   const handleNext = () => onChange(addMonths(value, 1));
   const handleToday = () => onChange(monthKeyOf(today()));

@@ -1,4 +1,5 @@
 import { db } from '../../data/db';
+import { deliverFile } from '../files/deliverFile';
 import { formatLocalDate } from '../../domain/dates';
 import { makeDefaultSettings } from '../../domain/seed';
 import {
@@ -40,6 +41,7 @@ export async function readBackupData(): Promise<BackupData> {
         seededAt: row.seededAt,
         lastBackupAt: row.lastBackupAt,
         persistenceRequested: row.persistenceRequested,
+        backupReminderDismissedAt: row.backupReminderDismissedAt ?? null,
       };
       return { categories, budgetVersions, transactions, settings };
     },
@@ -73,4 +75,15 @@ export async function markBackupCompleted(at: Date = new Date()): Promise<void> 
     const current = (await db.settings.get('app')) ?? makeDefaultSettings();
     await db.settings.put({ ...current, key: 'app', lastBackupAt: at.toISOString() });
   });
+}
+
+/**
+ * Descarga el respaldo actual y registra `lastBackupAt` sólo cuando la entrega
+ * resolvió. Lo usan "Descargar respaldo", "Descargar respaldo actual primero"
+ * (restaurar y borrar) y el recordatorio.
+ */
+export async function downloadCurrentBackup(now: Date = new Date()): Promise<void> {
+  const blob = await exportBackup(now);
+  await deliverFile(blob, backupFilename(now), BACKUP_MIME);
+  await markBackupCompleted(now);
 }

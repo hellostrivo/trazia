@@ -133,10 +133,15 @@ export function DonaChart({ data, totalCents }: DonaChartProps) {
               aria-hidden="true"
             ></span>
             <span className="dona-legend-label">{item.name}</span>
-            <span className="dona-legend-percentage">{Math.round((item.amountCents / totalCents) * 100)}%</span>
+            <span className="dona-legend-percentage">
+              {Math.round((item.amountCents / totalCents) * 100)}%
+            </span>
           </div>
         ))}
-        <div className="dona-legend-note" style={{ fontSize: '12px', marginTop: '0.5rem', color: 'var(--color-ink-600)' }}>
+        <div
+          className="dona-legend-note"
+          style={{ fontSize: '12px', marginTop: '0.5rem', color: 'var(--color-ink-600)' }}
+        >
           Los porcentajes están redondeados
         </div>
       </figcaption>

@@ -8,8 +8,12 @@ import Captura from './pages/Captura';
 import { Configuracion } from './pages/Configuracion';
 import Visualizacion from './pages/Visualizacion';
 import Movimientos from './pages/Movimientos';
+import {
+  REMINDER_DOT_TEXT,
+  useBackupReminder,
+} from './features/configuracion/RecordatorioRespaldo';
 
-function TabLink({ to, label }: { to: string; label: string }) {
+function TabLink({ to, label, dot = false }: { to: string; label: string; dot?: boolean }) {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -22,6 +26,12 @@ function TabLink({ to, label }: { to: string; label: string }) {
       aria-current={isActive ? 'page' : undefined}
     >
       {label}
+      {dot && (
+        <>
+          <span className="nav-dot" aria-hidden="true" />
+          <span className="sr-only"> ({REMINDER_DOT_TEXT})</span>
+        </>
+      )}
     </NavLink>
   );
 }
@@ -34,10 +44,17 @@ const navigation = [
 ];
 
 function Nav() {
+  // SPEC-07, punto 4: punto en la pestaña Configuración cuando el recordatorio está activo.
+  const reminder = useBackupReminder();
   return (
     <>
       {navigation.map((item) => (
-        <TabLink key={item.to} to={item.to} label={item.label} />
+        <TabLink
+          key={item.to}
+          to={item.to}
+          label={item.label}
+          dot={item.to === '/configuracion' && reminder.due}
+        />
       ))}
     </>
   );
@@ -92,11 +109,39 @@ export default function App() {
     <ErrorBoundary>
       <Routes>
         {/* SPEC-03 define Captura en `/`; `/captura` queda solo como redirección. */}
-        <Route path="/" element={<Shell><Captura /></Shell>} />
+        <Route
+          path="/"
+          element={
+            <Shell>
+              <Captura />
+            </Shell>
+          }
+        />
         <Route path="/captura" element={<Navigate to="/" replace />} />
-        <Route path="/visualizacion" element={<Shell><Visualizacion /></Shell>} />
-        <Route path="/movimientos" element={<Shell><Movimientos /></Shell>} />
-        <Route path="/configuracion" element={<Shell><Configuracion /></Shell>} />
+        <Route
+          path="/visualizacion"
+          element={
+            <Shell>
+              <Visualizacion />
+            </Shell>
+          }
+        />
+        <Route
+          path="/movimientos"
+          element={
+            <Shell>
+              <Movimientos />
+            </Shell>
+          }
+        />
+        <Route
+          path="/configuracion"
+          element={
+            <Shell>
+              <Configuracion />
+            </Shell>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ErrorBoundary>

@@ -9,6 +9,8 @@ import { BarrasChart } from '../features/configuracion/BarrasChart';
 import { ChartDataTable } from '../features/configuracion/ChartDataTable';
 import { PlanPdfSection } from '../features/configuracion/PlanPdfSection';
 import { RespaldoSection } from '../features/configuracion/RespaldoSection';
+import { BorrarDatosSection } from '../features/configuracion/BorrarDatosSection';
+import { RecordatorioRespaldo } from '../features/configuracion/RecordatorioRespaldo';
 import { PrivacidadSection, PRIVACIDAD_SECTION_ID } from '../features/configuracion/PrivacidadSection';
 import { Button } from '../components/Button';
 import { Dialog } from '../components/Dialog';
@@ -279,6 +281,9 @@ export function Configuracion() {
       </header>
 
       <div className="stack">
+        {/* Recordatorio de respaldo (SPEC-07, punto 4): sólo cuando toca */}
+        <RecordatorioRespaldo />
+
         {/* Totales */}
         {activeCategories.length > 0 && <TotalesCard totalBudgetCents={totalBudgetCents} categoriesWithBudgetCount={categoriesWithBudget} />}
 
@@ -332,6 +337,9 @@ export function Configuracion() {
 
         {/* Datos y respaldo (SPEC-07) */}
         <RespaldoSection />
+
+        {/* Borrar todos los datos (SPEC-07) */}
+        <BorrarDatosSection />
 
         {/* Privacidad (SPEC-07) */}
         <PrivacidadSection />

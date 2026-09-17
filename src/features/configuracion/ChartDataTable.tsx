@@ -68,7 +68,9 @@ export function ChartDataTable({ data, totalCents }: ChartDataTableProps) {
                     {item.name}
                   </div>
                 </td>
-                <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{formatMXN(item.amountCents)}</td>
+                <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                  {formatMXN(item.amountCents)}
+                </td>
                 <td style={{ textAlign: 'right' }}>{percentage}%</td>
               </tr>
             );
@@ -77,7 +79,9 @@ export function ChartDataTable({ data, totalCents }: ChartDataTableProps) {
         <tfoot>
           <tr>
             <th scope="row">Total</th>
-            <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 'bold' }}>
+            <td
+              style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 'bold' }}
+            >
               {formatMXN(totalCents)}
             </td>
             <td style={{ textAlign: 'right', fontWeight: 'bold' }}>100%</td>
