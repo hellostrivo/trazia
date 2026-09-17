@@ -12,7 +12,8 @@ export function ResumenBrieve({ monthKey, transactions }: { monthKey: string; tr
     <div className="resumen-brieve">
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h3>{monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}:</h3>
+          {/* h2: sigue al h1 "Captura" sin saltar nivel; el tamaño de h3 se conserva en CSS. */}
+          <h2>{monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)}:</h2>
           <p className="muted">{formatMXN(spent)} gastado</p>
         </div>
       </div>

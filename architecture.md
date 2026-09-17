@@ -183,7 +183,7 @@ interface AppSettings {         // registro único, key = "app"
 
 - **Sin red de terceros.** Encabezados en `netlify.toml`:
   - `Content-Security-Policy`: `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
-    - `'wasm-unsafe-eval'` y `data:` en `connect-src` existen sólo por `@react-pdf/renderer` v4: su motor de maquetado (Yoga) va compilado a WebAssembly e incrustado como `data:` URL. Ninguno de los dos permite ejecutar JavaScript arbitrario ni contactar otros orígenes (SPEC-08, T-090).
+    - `'wasm-unsafe-eval'` y `data:` en `connect-src` existen sólo por `@react-pdf/renderer` v4: su motor de maquetado (Yoga) va compilado a WebAssembly e incrustado como `data:` URL, y la app hace `fetch` de ese `data:` y luego `WebAssembly.instantiate`. Es el ajuste mínimo (aprobado, T-090): `'wasm-unsafe-eval'` permite compilar WebAssembly pero **no** `eval`, `new Function` ni ningún otro `eval` de JavaScript (eso exigiría `'unsafe-eval'`); `data:` en `connect-src` permite leer bytes que ya vienen en el bundle, **no** contactar ningún host. Siguen bloqueados los scripts inline y de otros orígenes, y cualquier `fetch`, `XMLHttpRequest` o WebSocket fuera de `'self'`.
   - `Referrer-Policy: no-referrer`;
   - `X-Content-Type-Options: nosniff`;
   - `Permissions-Policy` con cámara, micrófono, geolocalización y pagos desactivados;

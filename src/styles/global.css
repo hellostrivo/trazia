@@ -552,6 +552,10 @@ textarea,
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
+  /* Es un <ul>: sin viñetas ni sangría del navegador. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 /* Categoría Row */
@@ -1104,4 +1108,11 @@ textarea,
 
 .invitacion-instalar .row {
   margin-top: var(--space-3);
+}
+
+/* El resumen de Captura usa h2 (jerarquía h1 → h2) con el tamaño y los
+   márgenes por defecto de h3, para no cambiar el diseño. */
+.resumen-brieve h2 {
+  font-size: 1.17em;
+  margin: 1em 0;
 }

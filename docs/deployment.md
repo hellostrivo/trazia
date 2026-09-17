@@ -129,7 +129,7 @@ npm prune                                      # retira lighthouse de node_modul
 
 Umbrales: Accesibilidad ≥ 95, Buenas prácticas ≥ 95, Rendimiento ≥ 90. Lighthouse 12+ ya no trae la categoría PWA; la instalabilidad la verifica Chrome mismo (DevTools › Application › Manifest) y el E2E "Chrome considera la app instalable" (`Page.getInstallabilityErrors` por CDP).
 
-Resultados del 16 de septiembre de 2026 (Lighthouse 13.4.1, Chrome 152, móvil): `/` P 98 · A 98 · BP 100; `/configuracion` P 98 · A 95 · BP 100; instalable sin errores.
+Resultados del 16 de septiembre de 2026 (Lighthouse 13.4.1, Chrome 152, móvil): `/` P 98 · A 100 · BP 100; `/configuracion` P 98 · A 100 · BP 100; `/visualizacion` y `/movimientos` A 100 · BP 100 · P 97–98; instalable sin errores.
 
 ## 10. Ícono provisional
 

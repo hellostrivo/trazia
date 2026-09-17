@@ -43,7 +43,9 @@ export function CategoriaRow({
   onDelete,
 }: CategoriaRowProps) {
   return (
-    <div className="categoria-row" role="row">
+    // <li> y no role="row": la fila no es tabular (sin columnas ni encabezados);
+    // con role="row" los botones necesitarían una celda y Lighthouse lo marcaba.
+    <li className="categoria-row">
       <div
         className="categoria-row-color"
         style={{ backgroundColor: colorMap[colorKey] }}
@@ -81,6 +83,6 @@ export function CategoriaRow({
           Eliminar
         </Button>
       </div>
-    </div>
+    </li>
   );
 }

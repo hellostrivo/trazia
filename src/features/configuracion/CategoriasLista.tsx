@@ -41,7 +41,7 @@ export function CategoriasLista({
         </Button>
       </div>
 
-      <div className="categorias-list-container" role="table" aria-label="Lista de categorías">
+      <ul className="categorias-list-container" aria-label="Lista de categorías">
         {categories.map((category, index) => {
           const budgetCents = budgetsByCategory[category.id] ?? 0;
           const percentage = totalBudget > 0 ? (budgetCents / totalBudget) * 100 : null;
@@ -63,7 +63,7 @@ export function CategoriasLista({
             />
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }
