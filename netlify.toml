@@ -1,8 +1,53 @@
+# Configuración de despliegue en Netlify (SPEC-08). Preparada para ejecutarse
+# manualmente; ver docs/deployment.md. Los encabezados de seguridad son los de
+# docs/architecture.md §7 y `vite preview` los reproduce para los E2E.
+
 [build]
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  NODE_VERSION = "24"
+
+# SPA: cualquier ruta interna (/visualizacion, /movimientos…) sirve index.html.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    Referrer-Policy = "no-referrer"
+    X-Content-Type-Options = "nosniff"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    X-Robots-Tag = "noindex"
+
+# Los recursos del build llevan hash en el nombre: pueden cachearse para siempre.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# El documento y el service worker deben revalidarse siempre para que una
+# versión nueva se detecte de inmediato (aviso de actualización).
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"

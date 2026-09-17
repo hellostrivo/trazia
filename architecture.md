@@ -182,7 +182,8 @@ interface AppSettings {         // registro único, key = "app"
 ## 7. Seguridad y privacidad
 
 - **Sin red de terceros.** Encabezados en `netlify.toml`:
-  - `Content-Security-Policy`: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
+  - `Content-Security-Policy`: `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' data:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`;
+    - `'wasm-unsafe-eval'` y `data:` en `connect-src` existen sólo por `@react-pdf/renderer` v4: su motor de maquetado (Yoga) va compilado a WebAssembly e incrustado como `data:` URL. Ninguno de los dos permite ejecutar JavaScript arbitrario ni contactar otros orígenes (SPEC-08, T-090).
   - `Referrer-Policy: no-referrer`;
   - `X-Content-Type-Options: nosniff`;
   - `Permissions-Policy` con cámara, micrófono, geolocalización y pagos desactivados;

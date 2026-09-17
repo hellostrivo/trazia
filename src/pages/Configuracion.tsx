@@ -9,6 +9,7 @@ import { BarrasChart } from '../features/configuracion/BarrasChart';
 import { ChartDataTable } from '../features/configuracion/ChartDataTable';
 import { PlanPdfSection } from '../features/configuracion/PlanPdfSection';
 import { RespaldoSection } from '../features/configuracion/RespaldoSection';
+import { InvitacionInstalar } from '../features/configuracion/InvitacionInstalar';
 import { BorrarDatosSection } from '../features/configuracion/BorrarDatosSection';
 import { RecordatorioRespaldo } from '../features/configuracion/RecordatorioRespaldo';
 import { PrivacidadSection, PRIVACIDAD_SECTION_ID } from '../features/configuracion/PrivacidadSection';
@@ -337,6 +338,9 @@ export function Configuracion() {
 
         {/* Datos y respaldo (SPEC-07) */}
         <RespaldoSection />
+
+        {/* Invitación a instalar (SPEC-08): sólo Safari iOS sin modo standalone */}
+        <InvitacionInstalar />
 
         {/* Borrar todos los datos (SPEC-07) */}
         <BorrarDatosSection />

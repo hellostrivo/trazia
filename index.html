@@ -2,9 +2,17 @@
 <html lang="es-MX">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover: la app ocupa toda la pantalla en iPhone; las áreas
+         seguras se respetan en CSS con env(safe-area-inset-*). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="TRAZIA dashboard personal para control de gastos y presupuestos." />
-    <meta name="theme-color" content="#FAF7F2" />
+    <meta name="theme-color" content="#faf7f2" />
+    <!-- Metaetiquetas iOS (SPEC-08): app a pantalla completa al instalarla desde Safari. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="TRAZIA" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
+    <link rel="icon" href="/icons/trazia.svg" type="image/svg+xml" />
     <title>TRAZIA</title>
   </head>
   <body>

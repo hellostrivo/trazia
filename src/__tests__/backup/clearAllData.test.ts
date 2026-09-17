@@ -136,6 +136,34 @@ describe('clearAllData (SPEC-07, punto 5)', () => {
     expect(await snapshot()).toEqual(before);
   });
 
+  it('el primer arranque y el borrado total producen exactamente las mismas 8 categorías (nombres, colores y orden)', async () => {
+    // Primer arranque: base vacía → ensureSeedCategories (lo que hace main.tsx).
+    await ensureSeedCategories();
+    const shape = (rows: Awaited<ReturnType<typeof listCategories>>) =>
+      rows.map(({ name, colorKey, order, archivedAt }) => ({ name, colorKey, order, archivedAt }));
+    const firstBoot = shape(await listCategories());
+    const firstBootSettings = await getSettings();
+
+    // Vida real: datos, respaldo, descarte del recordatorio… y borrado total.
+    await seedRealData();
+    await markBackupCompleted(new Date('2026-09-01T00:00:00.000Z'));
+    await db.settings.update('app', { backupReminderDismissedAt: '2026-09-02T00:00:00.000Z' });
+    await clearAllData();
+
+    const afterClear = shape(await listCategories());
+    expect(afterClear).toEqual(firstBoot);
+    expect(afterClear).toHaveLength(8);
+    expect(afterClear.map((c) => c.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+
+    // Y settings equivalentes salvo el instante de la siembra.
+    const afterClearSettings = await getSettings();
+    expect({ ...afterClearSettings, seededAt: null }).toEqual({
+      ...firstBootSettings,
+      seededAt: null,
+    });
+    expect(afterClearSettings.seededAt).not.toBeNull();
+  });
+
   it('criterio 1: respaldar → borrar todo → restaurar deja los datos idénticos', async () => {
     await seedRealData();
     const original = await snapshot();

@@ -1025,3 +1025,83 @@ textarea,
   color: var(--color-ink-900);
   font-size: var(--font-size-16);
 }
+
+/* SPEC-08 — Áreas seguras de iOS (viewport-fit=cover). En navegadores sin
+   env() el valor es 0 y no cambia nada. La barra inferior ya suma
+   safe-area-inset-bottom a su padding; aquí se cubren los laterales (iPhone en
+   horizontal) y la parte superior del contenido. */
+.page-shell {
+  padding-left: calc(var(--space-5) + env(safe-area-inset-left));
+  padding-right: calc(var(--space-5) + env(safe-area-inset-right));
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top));
+}
+
+@media (max-width: 767px) {
+  .page-shell {
+    padding-left: calc(var(--space-4) + env(safe-area-inset-left));
+    padding-right: calc(var(--space-4) + env(safe-area-inset-right));
+    padding-top: calc(var(--space-5) + env(safe-area-inset-top));
+  }
+
+  .bottom-nav {
+    padding-left: calc(var(--space-3) + env(safe-area-inset-left));
+    padding-right: calc(var(--space-3) + env(safe-area-inset-right));
+  }
+}
+
+.toast-region {
+  right: calc(var(--space-4) + env(safe-area-inset-right));
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+}
+
+/* SPEC-08 — Aviso "Hay una nueva versión disponible · Actualizar". Fijo,
+   encima de la barra inferior en móvil, y del toast en el orden de capas. */
+.actualizacion-disponible {
+  position: fixed;
+  left: calc(var(--space-4) + env(safe-area-inset-left));
+  right: calc(var(--space-4) + env(safe-area-inset-right));
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 auto;
+  max-width: 36rem;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.actualizacion-disponible__texto {
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .actualizacion-disponible {
+    bottom: calc(5rem + var(--space-2) + env(safe-area-inset-bottom));
+  }
+}
+
+/* SPEC-08 — Invitación a instalar (sólo Safari iOS, fuera de standalone). */
+.invitacion-instalar {
+  padding: var(--space-5);
+}
+
+.invitacion-instalar h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-20);
+}
+
+.invitacion-instalar p {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink-600);
+  line-height: 1.6;
+}
+
+.invitacion-instalar .row {
+  margin-top: var(--space-3);
+}

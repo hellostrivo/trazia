@@ -35,13 +35,13 @@ No se requieren variables de entorno para ejecutar la app. Consulta `.env.exampl
 | `npm run dev` | Servidor local en `http://localhost:5173` |
 | `npm run dev -- --host` | Igual, accesible desde el iPhone en la misma red Wi-Fi |
 | `npm run build` | Compilación de producción en `dist/` |
-| `npm run preview` | Sirve la compilación de producción localmente |
+| `npm run preview` | Sirve la compilación de producción en `http://localhost:4173`, con los encabezados de `netlify.toml` y el service worker |
 | `npm run typecheck` | Verificación de TypeScript |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
 | `npm run test` | Pruebas unitarias y de componentes (Vitest) |
-| `npm run test:e2e` | Pruebas de extremo a extremo (Playwright: Chromium y WebKit) |
-| `npm run validate` | typecheck, lint, test y build en secuencia |
+| `npm run test:e2e` | Pruebas de extremo a extremo (Playwright: Chromium y WebKit) contra `npm run build && npm run preview`, es decir, contra el artefacto que se despliega |
+| `npm run validate` | typecheck, lint, test, build y test:e2e en secuencia |
 
 ## Despliegue
 

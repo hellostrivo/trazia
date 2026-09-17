@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { db } from '../db';
 import { normalizeName } from '../../domain/categories';
 import { categorySchema } from '../../domain/schemas';
+import { makeSeedCategories } from '../../domain/seed';
 import type { Category } from '../../domain/types';
 
 export class CategoryInUseError extends Error {
@@ -26,7 +27,9 @@ export async function getCategory(id: string): Promise<Category | undefined> {
   return db.categories.get(id);
 }
 
-export async function upsertCategory(input: z.infer<typeof categoryUpsertInputSchema> & { id?: string }): Promise<Category> {
+export async function upsertCategory(
+  input: z.infer<typeof categoryUpsertInputSchema> & { id?: string },
+): Promise<Category> {
   const payload = categoryUpsertInputSchema.parse(input);
   const now = new Date().toISOString();
   const existing = input.id ? await db.categories.get(input.id) : undefined;
@@ -71,33 +74,16 @@ export async function ensureSeedCategories(): Promise<void> {
   const existing = await db.categories.count();
   if (existing > 0) return;
 
+  // Una sola fuente para la semilla: la misma que usa el borrado total
+  // (`clearAllData`), así el primer arranque y el borrado dejan apps idénticas.
   const now = new Date().toISOString();
-  const categorySeeds = [
-    { name: 'Hogar', colorKey: 'slate', order: 0 },
-    { name: 'Supermercado', colorKey: 'sage', order: 1 },
-    { name: 'Transporte', colorKey: 'ochre', order: 2 },
-    { name: 'Salud', colorKey: 'clay', order: 3 },
-    { name: 'Cuidado personal', colorKey: 'plum', order: 4 },
-    { name: 'Comidas fuera', colorKey: 'teal', order: 5 },
-    { name: 'Entretenimiento', colorKey: 'olive', order: 6 },
-    { name: 'Otros', colorKey: 'stone', order: 7 },
-  ] as const;
-
-  const normalized = categorySeeds.map((seed) => ({
-    id: crypto.randomUUID(),
-    name: seed.name,
-    colorKey: seed.colorKey,
-    order: seed.order,
-    archivedAt: null,
-    createdAt: now,
-    updatedAt: now,
-  }));
+  const seed = makeSeedCategories(now).map((category) => categorySchema.parse(category));
 
   await db.transaction('rw', db.categories, db.settings, async () => {
     const currentSettings = await db.settings.get('app');
     if (currentSettings?.seededAt) return;
 
-    await db.categories.bulkPut(normalized.map((category) => categorySchema.parse(category)));
+    await db.categories.bulkPut(seed);
     await db.settings.put({
       key: 'app',
       seededAt: now,

@@ -1,7 +1,10 @@
+// Primero: apaga el JIT de Zod antes de que se definan los esquemas (ver zodConfig.ts).
+import './zodConfig';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { ActualizacionDisponible } from './features/pwa/ActualizacionDisponible';
 import { ensureSeedCategories } from './data/repositories/categories';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -19,6 +22,8 @@ async function bootstrap() {
     <React.StrictMode>
       <BrowserRouter>
         <App />
+        {/* SPEC-08: registro del service worker y aviso de versión nueva. */}
+        <ActualizacionDisponible />
       </BrowserRouter>
     </React.StrictMode>,
   );

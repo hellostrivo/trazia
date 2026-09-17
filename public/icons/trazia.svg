@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="TRAZIA">
+  <!-- Ícono provisional (SPEC-08, pendiente P-005): monograma "T" en azul-pizarra
+       (--color-graph-slate #3e5c76) con trazo salvia (--color-graph-sage #6b9080)
+       sobre el fondo crema de la app (--color-bg #faf7f2). -->
+  <rect width="512" height="512" rx="112" fill="#faf7f2"/>
+  <path d="M128 136H384V200H288V392H224V200H128Z" fill="#3e5c76" stroke="#6b9080" stroke-width="16" stroke-linejoin="round"/>
+  <rect x="200" y="416" width="112" height="16" rx="8" fill="#6b9080"/>
+</svg>
