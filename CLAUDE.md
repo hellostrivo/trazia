@@ -4,7 +4,7 @@ Este archivo lo lee Claude Code al abrir el repositorio. Sus reglas son obligato
 
 ## Raíz autorizada
 
-- Raíz local: `~/Desktop/TRAZIA/repo_trazia` (en Finder aparece como Escritorio › TRAZIA › repo_trazia).
+- Raíz local: `~/Developer/trazia` (en Finder aparece como Developer › trazia, dentro de la carpeta de usuario). Hasta el 20 oct 2026 fue `~/Desktop/TRAZIA/repo_trazia`.
 - Repositorio remoto previsto: `https://github.com/hellostrivo/trazia`.
 - Antes de modificar cualquier archivo, confirma con `pwd` que estás en esta raíz.
 

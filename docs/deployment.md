@@ -34,8 +34,8 @@ El service worker **precachea todo `dist/`** (≈2.6 MB, incluidos los chunks de
 ## 2. Repositorio local
 
 ```bash
-cd ~/Desktop/TRAZIA/repo_trazia
-pwd                         # debe terminar en /TRAZIA/repo_trazia
+cd ~/Developer/trazia
+pwd                         # debe terminar en /Developer/trazia
 git status                  # árbol limpio, en main
 ```
 

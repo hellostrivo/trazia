@@ -6,7 +6,7 @@ Estados: ✅ validada por la persona usuaria · 🟡 propuesta técnica (decisi�
 
 | ID | Decisión | Estado |
 |---|---|---|
-| D-001 | Raíz local `~/Desktop/TRAZIA/repo_trazia`; remoto `github.com/hellostrivo/trazia` | ✅ |
+| D-001 | Raíz local `~/Developer/trazia` (desde el 20 oct 2026, al pasar a una Mac nueva; antes `~/Desktop/TRAZIA/repo_trazia`); remoto `github.com/hellostrivo/trazia` | ✅ |
 | D-002 | Datos solo en el dispositivo (IndexedDB) con respaldo manual en JSON. Sin cuentas ni nube | ✅ |
 | D-003 | Gastos fijos y suscripciones: fase 2 | ✅ |
 | D-004 | Sin ingresos en el MVP; se compara gasto contra presupuesto | ✅ |
@@ -48,7 +48,7 @@ Estados: ✅ validada por la persona usuaria · 🟡 propuesta técnica (decisi�
 
 ## Supuestos
 
-- La persona usuaria trabaja en macOS (Escritorio = `~/Desktop`). En Windows, la ruta equivalente es `%USERPROFILE%\Desktop\TRAZIA\repo_trazia`.
+- La persona usuaria trabaja en macOS, con el proyecto en `~/Developer/trazia`. En Windows, la ruta equivalente es `%USERPROFILE%\Developer\trazia`.
 - La zona horaria es la del dispositivo.
 - La cuenta `hellostrivo` de GitHub se usa por decisión de la persona usuaria. El repositorio `trazia` es independiente de Strivo.
 

@@ -22,7 +22,7 @@ Aplicación web personal para registrar gastos, definir presupuestos mensuales p
 ## Instalación
 
 ```bash
-cd ~/Desktop/TRAZIA/repo_trazia
+cd ~/Developer/trazia
 npm install
 ```
 
